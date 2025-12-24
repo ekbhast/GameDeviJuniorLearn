@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="FirstProject/FirstProject.csproj" Id="d3177b57-31e6-4253-a228-ab8f519bf963" />
+  <Folder Name="/arrays/">
+    <Project Path="arrays - sort numbers/arrays - sort numbers.csproj" Id="1aa48972-f29d-44f3-9fd1-0857b84dc837" />
+    <Project Path="FirstProject/arrays2.csproj" Id="d3177b57-31e6-4253-a228-ab8f519bf963" />
+  </Folder>
 </Solution>
