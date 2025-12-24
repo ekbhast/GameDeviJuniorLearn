@@ -2,5 +2,8 @@
   <Folder Name="/arrays/">
     <Project Path="arrays - sort numbers/arrays - sort numbers.csproj" Id="1aa48972-f29d-44f3-9fd1-0857b84dc837" />
     <Project Path="FirstProject/arrays2.csproj" Id="d3177b57-31e6-4253-a228-ab8f519bf963" />
+    <Project Path="parenthesis/parenthesis.csproj" Id="f49c8300-d307-4dfe-8386-2cc5248c28db" />
+    <Project Path="shiftArray/shiftArray.csproj" Id="10cb7803-2702-4b62-ad50-9719cd38e002" />
+    <Project Path="split/split.csproj" Id="fdc5efc5-0281-44e4-a03d-e42da12b1e27" />
   </Folder>
 </Solution>
