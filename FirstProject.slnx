@@ -6,4 +6,8 @@
     <Project Path="shiftArray/shiftArray.csproj" Id="10cb7803-2702-4b62-ad50-9719cd38e002" />
     <Project Path="split/split.csproj" Id="fdc5efc5-0281-44e4-a03d-e42da12b1e27" />
   </Folder>
+  <Folder Name="/functions/" />
+  <Folder Name="/lectures/">
+    <Project Path="lectures/lectures.csproj" Id="e9187fa6-b325-49b7-90a0-9cf2358769ae" />
+  </Folder>
 </Solution>
