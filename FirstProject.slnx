@@ -10,4 +10,7 @@
   <Folder Name="/lectures/">
     <Project Path="lectures/lectures.csproj" Id="e9187fa6-b325-49b7-90a0-9cf2358769ae" />
   </Folder>
+  <Folder Name="/pacman/">
+    <Project Path="pacman/pacman.csproj" Id="8d06463c-4c7e-4425-9ba6-27c561dd96fc" />
+  </Folder>
 </Solution>
