@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace pacman
 {
@@ -13,8 +14,17 @@ namespace pacman
 
             ConsoleKeyInfo pressedKey = new ConsoleKeyInfo('w', ConsoleKey.W, false, false, false);
 
+            Task.Run(() =>
+            {   
+                while(true)
+                {
+                    pressedKey = Console.ReadKey();
+                }                
+            });
+
             int pacmanX = 1;
             int pacmanY = 1;
+            int score = 0;
 
             while (true)
             {
@@ -26,13 +36,15 @@ namespace pacman
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.SetCursorPosition(pacmanX, pacmanY);
                 Console.Write('@');
+
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.SetCursorPosition(31, 0);
-                Console.Write(pressedKey.KeyChar);
+                Console.Write($"Score: {score}");
 
-                pressedKey = Console.ReadKey();
 
-                HandleInput(pressedKey, ref pacmanX, ref pacmanY, map);
+                HandleInput(pressedKey, ref pacmanX, ref pacmanY, map, ref score);
+
+                Thread.Sleep(1000);
             }
         }
 
@@ -66,17 +78,25 @@ namespace pacman
             }
         }
 
-        private static void HandleInput(ConsoleKeyInfo pressedKey, ref int pacmanX, ref int pacmanY, char[,] map)
+        private static void HandleInput(ConsoleKeyInfo pressedKey, ref int pacmanX, ref int pacmanY, char[,] map, ref int score)
         {
             int [] direction = GetDirection(pressedKey);
 
             int nextPacmanPositionX = pacmanX + direction[0];
             int nextPacmanPositionY = pacmanY + direction[1];
 
-            if (map[nextPacmanPositionX, nextPacmanPositionY] == ' ')
+            char nextCell = map[nextPacmanPositionX, nextPacmanPositionY];
+
+            if (nextCell == ' ' || nextCell == '.')
             {
                 pacmanX = nextPacmanPositionX;
                 pacmanY = nextPacmanPositionY;
+
+                if (nextCell == '.')
+                {
+                    score += 1;
+                    map[nextPacmanPositionX, nextPacmanPositionY] = ' ';
+                }
             }
         }
 

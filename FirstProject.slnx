@@ -6,7 +6,11 @@
     <Project Path="shiftArray/shiftArray.csproj" Id="10cb7803-2702-4b62-ad50-9719cd38e002" />
     <Project Path="split/split.csproj" Id="fdc5efc5-0281-44e4-a03d-e42da12b1e27" />
   </Folder>
-  <Folder Name="/functions/" />
+  <Folder Name="/functions/">
+    <Project Path="ReadInt/ReadInt.csproj" Id="75808a35-6540-4c41-9779-6de54ee0e037" />
+    <Project Path="Shuffle/Shuffle.csproj" Id="80df91cc-d288-43cf-b8c2-1395cc2ea473" />
+    <Project Path="UIElement/UIElement.csproj" Id="f831533e-a36d-4372-bcb1-de2f0d1a5b8d" />
+  </Folder>
   <Folder Name="/lectures/">
     <Project Path="lectures/lectures.csproj" Id="e9187fa6-b325-49b7-90a0-9cf2358769ae" />
   </Folder>
