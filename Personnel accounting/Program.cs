@@ -12,7 +12,7 @@ namespace Personnel_accounting
         {
             string[] employees = 
             {
-                "Казаков Тимофей Максимович",
+                "Гуров Тимофей Максимович",
                 "Скворцова Ульяна Андреевна",
                 "Богданов Андрей Кириллович",
                 "Максимов Артём Робертович",
@@ -37,7 +37,7 @@ namespace Personnel_accounting
                 "Васильева София Никитична",
                 "Серова Александра Александровна",
                 "Васильева Ярослава Кирилловна",
-                "Абрамов Егор Валерьевич",
+                "Гуров Егор Валерьевич",
                 "Карташова Елизавета Львовна",
                 "Кузнецова Мария Павловна",
                 "Жилин Всеволод Максимович",
@@ -77,7 +77,78 @@ namespace Personnel_accounting
                 "Офис-менеджер"
             };
 
-            ShowEmployees(FilterEmployees(employees), employees, positions);
+            bool isExit = false;
+            ConsoleColor defaultConsoleColor = Console.ForegroundColor;
+
+            while(isExit == false)
+            {
+                ShowMainMenu();
+
+                string userInput = Console.ReadLine();
+
+                switch (userInput) 
+                {
+                    case "3":
+                        Console.Clear();
+
+                        ShowEmployees(FilterEmployees(employees), employees, positions);
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("Введите порядковый номер сотрудника которго необходимо удалить: ");
+
+                        string inputIndex = Console.ReadLine();
+                        bool isNumber = int.TryParse(inputIndex, out int index);
+
+                        if (isNumber && index >= 0 && index <= employees.Length)
+                        {   
+                            Console.WriteLine($"Вы выбрали сотрудника под номером {index}");
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Вы ввели не число или порядковый номер которго не существует");
+                        }
+
+                        Console.ForegroundColor = defaultConsoleColor;
+                        Console.Write('\n');
+                            break;
+                    case "2":
+                        Console.Clear();
+
+                        ShowEmployees(FilterEmployees(employees), employees, positions);
+
+                        Console.Write('\n');
+                        break;
+                    case "5":
+                        isExit = true;
+                        break;
+                    default:
+                        Console.WriteLine("Выбран не существующий пункт меню");
+                        break;
+                }
+            }
+        }
+
+        private static void ShowMainMenu()
+        {
+            const string AddCommand = "1";
+            const string ShowAllCommand = "2";
+            const string DeleteCommand = "3";
+            const string SearchLastnameCommand = "4";
+            const string ExitCommand = "5";
+
+            const string AddItemMenuName = "Добавить сотрудника";
+            const string ShowAllItemMenuName = "Показать всех сотрудников";
+            const string DeleteItemMenuName = "Удалить сотрудника";
+            const string SearchLastnameItemMenuName = "Найти сотрудника  по фамилии";
+            const string ExitItemMenuName = "Выход";
+
+            Console.WriteLine($"{AddCommand}. {AddItemMenuName}");
+            Console.WriteLine($"{ShowAllCommand}. {ShowAllItemMenuName}");
+            Console.WriteLine($"{DeleteCommand}. {DeleteItemMenuName}");
+            Console.WriteLine($"{SearchLastnameCommand}. {SearchLastnameItemMenuName}");
+            Console.WriteLine($"{ExitCommand}. {ExitItemMenuName}");
+
         }
 
         private static void CreateEmployee() { }
@@ -86,32 +157,50 @@ namespace Personnel_accounting
         {           
             for (int i = 0; i < filteredIndex.Length; i++)
             {
-                Console.WriteLine($"{employees[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
+                Console.WriteLine($"{i + 1} - {employees[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
             }
         }
 
         private static void DeleteEmployee() { }
 
-        private static int[] FilterEmployees(string[] employees, string filterValue = "all")
+        private static int[] FilterEmployees(string[] employees, string filterLastname = "all")
         {
-            int[] filteredIndex;
-           
+            int[] filteredIndex = new int[0];
+
+            if (filterLastname == "all")
+            {
                 filteredIndex = new int[employees.Length];
 
                 for (int i = 0; i < filteredIndex.Length; i++)
                 {
                     filteredIndex[i] = i;
                 }
-                return filteredIndex;
-            //if (filterValue == "all")
-            //{
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < employees.Length; i++)
-            //    {
 
-            //    }
+                return filteredIndex;
+            } 
+            else
+            {
+                for (int i = 0; i <= employees.Length - 1 ; i++) 
+                {
+                    string lastname = employees[i].Split(' ')[0];
+
+                    if (lastname == filterLastname)
+                    {
+                        
+                        int[] tempFilteredIndex = new int[filteredIndex.Length + 1];
+
+                        for (int j = 0; j < filteredIndex.Length - 1; j++) 
+                        {
+                            tempFilteredIndex[j] = filteredIndex[j];
+                        }
+
+                        tempFilteredIndex[tempFilteredIndex.Length - 1] = i; 
+
+                        filteredIndex = tempFilteredIndex;
+                    }
+                }
+                return filteredIndex;
+            }
         }
     }
 }
