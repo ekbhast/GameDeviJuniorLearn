@@ -6,155 +6,6 @@ namespace Personnel_accounting
     {
         static void Main(string[] args)
         {
-            string[] employees = 
-            {
-                "Гуров Тимофей Максимович",
-                "Скворцова Ульяна Андреевна",
-                "Богданов Андрей Кириллович",
-                "Максимов Артём Робертович",
-                "Герасимов Денис Андреевич",
-                //"Гуров Иван Максимович",
-                //"Сафонов Михаил Юрьевич",
-                //"Моисеев Даниил Дмитриевич",
-                //"Лебедева Василиса Максимовна",
-                //"Коршунов Михаил Львович",
-                //"Давыдов Андрей Никитич",
-                //"Дубинина Таисия Адамовна",
-                //"Куликов Артём Макарович",
-                //"Николаева Полина Матвеевна",
-                //"Плотников Дамир Артемьевич",
-                //"Ушакова Амина Борисовна",
-                //"Савельева Арина Родионовна",
-                //"Ефимов Георгий Романович",
-                //"Парфенов Давид Егорович",
-                //"Попова Софья Александровна",
-                //"Зубкова Софья Ивановна",
-                //"Чижова Екатерина Ивановна",
-                //"Васильева София Никитична",
-                //"Серова Александра Александровна",
-                //"Васильева Ярослава Кирилловна",
-                //"Гуров Егор Валерьевич",
-                //"Карташова Елизавета Львовна",
-                //"Кузнецова Мария Павловна",
-                //"Жилин Всеволод Максимович",
-                //"Черкасов Артём Александрович"
-            };
-            string[] positions =
-            {
-                "Генеральный директор",
-                "Исполнительный директор",
-                "Технический директор",
-                "Финансовый директор",
-                "Коммерческий директор",
-                //"Руководитель отдела разработки",
-                //"Руководитель отдела продаж",
-                //"Руководитель отдела маркетинга",
-                //"Руководитель отдела персонала",
-                //"Руководитель IT-отдела",
-                //"Старший программист",
-                //"Программист",
-                //"Младший программист",
-                //"Frontend-разработчик",
-                //"Backend-разработчик",
-                //"Fullstack-разработчик",
-                //"Тестировщик",
-                //"Ведущий тестировщик",
-                //"Системный администратор",
-                //"DevOps-инженер",
-                //"Бизнес-аналитик",
-                //"Системный аналитик",
-                //"Проектный менеджер",
-                //"Продуктовый менеджер",
-                //"UX/UI дизайнер",
-                //"Графический дизайнер",
-                //"Контент-менеджер",
-                //"SEO-специалист",
-                //"Специалист технической поддержки",
-                //"Офис-менеджер"
-            };
-
-            bool isExit = false;
-            ConsoleColor defaultConsoleColor = Console.ForegroundColor;
-
-            while(isExit == false)
-            {
-                ShowMainMenu();
-
-                string userInput = Console.ReadLine();
-
-                switch (userInput) 
-                {
-                    case "1":
-                        Console.WriteLine("Введите ФИО нового сутрудника");
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        string newEmployee = Console.ReadLine();
-
-                        Console.ForegroundColor = defaultConsoleColor;
-
-                        Console.WriteLine("Введите должность сотрудника");
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        string position = Console.ReadLine();
-
-                        Console.ForegroundColor = defaultConsoleColor;
-
-                        CreateEmployee(newEmployee, position, ref employees, ref positions);
-
-                        Console.WriteLine("Сотрудник успешно добавлен!\n");
-                        ShowEmployees(FilterEmployees(employees), employees, positions);
-                        break;
-
-                    case "3":
-                        Console.Clear();
-
-                        ShowEmployees(FilterEmployees(employees), employees, positions);
-
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("Введите порядковый номер сотрудника которго необходимо удалить: ");
-
-                        string inputIndex = Console.ReadLine();
-
-                        int removeIndex;
-                        bool isNumber = int.TryParse(inputIndex, out removeIndex);
-
-                        if (isNumber && removeIndex >= 0 && removeIndex <= employees.Length)
-                        {   
-                            Console.WriteLine($"Вы выбрали сотрудника - {employees[removeIndex - 1]}");
-                            DeleteEmployee(removeIndex, ref employees, ref positions);
-
-                            Console.WriteLine($"Новый массив:");
-                            ShowEmployees(FilterEmployees(employees), employees, positions);
-                        }
-                        else
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Вы ввели не число или порядковый номер которго не существует");
-                        }
-
-                        Console.ForegroundColor = defaultConsoleColor;
-                        Console.Write('\n');
-                        break;
-
-                    case "2":
-                        Console.Clear();
-
-                        ShowEmployees(FilterEmployees(employees), employees, positions);
-
-                        Console.Write('\n');
-                        break;
-
-                    case "5":
-                        isExit = true;
-                        break;
-
-                    default:
-                        Console.WriteLine("Выбран не существующий пункт меню");
-                        break;
-                }
-            }
-        }
-
-        private static void ShowMainMenu()
-        {
             const string AddCommand = "1";
             const string ShowAllCommand = "2";
             const string DeleteCommand = "3";
@@ -167,27 +18,146 @@ namespace Personnel_accounting
             const string SearchLastnameItemMenuName = "Найти сотрудника  по фамилии";
             const string ExitItemMenuName = "Выход";
 
-            Console.WriteLine($"{AddCommand}. {AddItemMenuName}");
-            Console.WriteLine($"{ShowAllCommand}. {ShowAllItemMenuName}");
-            Console.WriteLine($"{DeleteCommand}. {DeleteItemMenuName}");
-            Console.WriteLine($"{SearchLastnameCommand}. {SearchLastnameItemMenuName}");
-            Console.WriteLine($"{ExitCommand}. {ExitItemMenuName}");
+            string[] employees = 
+            {
+                "Гуров Тимофей Максимович",
+                "Скворцова Ульяна Андреевна",
+                "Гуров Андрей Кириллович",
+                "Максимов Артём Робертович",
+                "Герасимов Денис Андреевич"
+            };
+            string[] positions =
+            {
+                "Генеральный директор",
+                "Исполнительный директор",
+                "Технический директор",
+                "Финансовый директор",
+                "Коммерческий директор"
+            };
 
+            bool isExit = false;
+
+            while(isExit == false)
+            {
+                Console.WriteLine($"{AddCommand}. {AddItemMenuName}");
+                Console.WriteLine($"{ShowAllCommand}. {ShowAllItemMenuName}");
+                Console.WriteLine($"{DeleteCommand}. {DeleteItemMenuName}");
+                Console.WriteLine($"{SearchLastnameCommand}. {SearchLastnameItemMenuName}");
+                Console.WriteLine($"{ExitCommand}. {ExitItemMenuName}");
+
+                string userInput = Console.ReadLine();
+
+                switch (userInput) 
+                {
+                    case AddCommand:
+                        AddEmployee(ref employees, ref positions);
+                        break;
+
+                    case ShowAllCommand:
+                        ShowEmployees(FilterEmployees(employees), employees, positions);
+                        break;
+
+                    case DeleteCommand:
+                        DeleteEmployee(ref employees, ref positions);
+                        break;
+
+                    case SearchLastnameCommand:
+                        SearchEmployee(ref employees, ref positions);
+                        break;
+
+                    case ExitCommand:
+                        isExit = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Выбран не существующий пункт меню");
+                        break;
+                }
+            }
+        }
+
+        private static void AddEmployee(ref string[] employees, ref string[] positions)
+        {
+            Console.Clear();
+            Console.WriteLine("Введите ФИО нового сутрудника, не менее 3х символов");
+
+            string newEmployee = CheckImputLength();
+
+            Console.Clear();
+            Console.WriteLine("Введите должность сотрудника, не менее 3х символов");
+
+            string position = CheckImputLength();
+            CreateEmployee(newEmployee, position, ref employees, ref positions);
+
+            Console.WriteLine("Сотрудник успешно добавлен!\n");
+            ShowEmployees(FilterEmployees(employees), employees, positions);
+        }
+
+        private static void DeleteEmployee(ref string[] employees, ref string[] positions)
+        {
+            Console.Clear();
+
+            ShowEmployees(FilterEmployees(employees), employees, positions);
+
+            Console.Write("Введите порядковый номер сотрудника которго необходимо удалить: ");
+
+            string inputIndex = Console.ReadLine();
+
+            int removeIndex;
+            bool isNumber = int.TryParse(inputIndex, out removeIndex);
+
+            if (isNumber && removeIndex > 0 && removeIndex <= employees.Length)
+            {
+                Console.WriteLine($"Вы выбрали сотрудника - {employees[removeIndex - 1]}");
+                DeleteEmployee(removeIndex, ref employees, ref positions);
+
+                Console.Clear();
+
+                Console.WriteLine($"Все сотрудники:");
+                ShowEmployees(FilterEmployees(employees), employees, positions);
+            }
+            else
+            {
+                Console.WriteLine("Вы ввели не число или порядковый номер которго не существует");
+            }
+
+            Console.Write('\n');
+        }
+
+        private static void SearchEmployee(ref string[] employees, ref string[] positions) 
+        {
+            Console.WriteLine("Введите Фамилию сотрудника для поиска");
+
+            string inputLastnameEmployee = Console.ReadLine();
+            ShowEmployees(FilterEmployees(employees, inputLastnameEmployee), employees, positions);
         }
 
         private static void CreateEmployee(string newEmployee, string position, ref string[] employees, ref string[] positions) 
         {
             AddArrayItem(newEmployee, ref employees);
             AddArrayItem(position, ref positions);
+            Console.Clear();
         }
 
         private static void ShowEmployees(int[] filteredIndex, string[] employees, string[] positions)
-        {           
-            for (int i = 0; i < filteredIndex.Length; i++)
+        {
+            Console.Clear();
+
+            if (filteredIndex.Length <= 0)
             {
-                Console.WriteLine($"{i + 1} - {employees[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
+                Console.WriteLine("Не найдено ни одного сотрудника");
             }
+            else
+            {
+                for (int i = 0; i < filteredIndex.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1} - {employees[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
+                }
+                Console.Write('\n');
+            }
+
             Console.Write('\n');
+
         }
 
         private static void DeleteEmployee(int indexEmployee,  ref string [] employees, ref string[] positions) 
@@ -198,14 +168,16 @@ namespace Personnel_accounting
 
         private static void RemoveArrayItem(int removeIndex, ref string[] array)
         {
-            int newIndex = 0;
             string[] tempArray = new string[array.Length - 1];
-            for (int i = 0; i < array.Length; i++) 
-            {
-                if (i == removeIndex - 1) continue;
 
-                tempArray[newIndex] = array[i];
-                newIndex++;
+            for (int i = 0; i < removeIndex - 1; i++) 
+            {
+                tempArray[i] = array[i];
+            }
+
+            for (int i = removeIndex; i < array.Length; i++) 
+            {
+                tempArray[i - 1] = array[i];
             }
 
             array = tempArray;
@@ -244,11 +216,10 @@ namespace Personnel_accounting
             {
                 for (int i = 0; i <= employees.Length - 1 ; i++) 
                 {
-                    string lastname = employees[i].Split(' ')[0];
+                    string lastname = employees[i].Split()[0];
 
                     if (lastname == filterLastname)
                     {
-                        
                         int[] tempFilteredIndex = new int[filteredIndex.Length + 1];
 
                         for (int j = 0; j < filteredIndex.Length - 1; j++) 
@@ -263,6 +234,19 @@ namespace Personnel_accounting
                 }
                 return filteredIndex;
             }
+        }
+
+        private static string CheckImputLength()
+        {
+            string inputString = Console.ReadLine();
+
+            while (inputString.Length <= 3)
+            {
+                Console.WriteLine("Не менее 3х символов");
+                inputString = Console.ReadLine();
+            }
+
+            return inputString;
         }
     }
 }
