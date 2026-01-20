@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Personnel_accounting
 {
@@ -88,6 +84,25 @@ namespace Personnel_accounting
 
                 switch (userInput) 
                 {
+                    case "1":
+                        Console.WriteLine("Введите ФИО нового сутрудника");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        string newEmployee = Console.ReadLine();
+
+                        Console.ForegroundColor = defaultConsoleColor;
+
+                        Console.WriteLine("Введите должность сотрудника");
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        string position = Console.ReadLine();
+
+                        Console.ForegroundColor = defaultConsoleColor;
+
+                        CreateEmployee(newEmployee, position, ref employees, ref positions);
+
+                        Console.WriteLine("Сотрудник успешно добавлен!\n");
+                        ShowEmployees(FilterEmployees(employees), employees, positions);
+                        break;
+
                     case "3":
                         Console.Clear();
 
@@ -117,7 +132,8 @@ namespace Personnel_accounting
 
                         Console.ForegroundColor = defaultConsoleColor;
                         Console.Write('\n');
-                            break;
+                        break;
+
                     case "2":
                         Console.Clear();
 
@@ -125,9 +141,11 @@ namespace Personnel_accounting
 
                         Console.Write('\n');
                         break;
+
                     case "5":
                         isExit = true;
                         break;
+
                     default:
                         Console.WriteLine("Выбран не существующий пункт меню");
                         break;
@@ -157,7 +175,11 @@ namespace Personnel_accounting
 
         }
 
-        private static void CreateEmployee() { }
+        private static void CreateEmployee(string newEmployee, string position, ref string[] employees, ref string[] positions) 
+        {
+            AddArrayItem(newEmployee, ref employees);
+            AddArrayItem(position, ref positions);
+        }
 
         private static void ShowEmployees(int[] filteredIndex, string[] employees, string[] positions)
         {           
@@ -165,6 +187,7 @@ namespace Personnel_accounting
             {
                 Console.WriteLine($"{i + 1} - {employees[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
             }
+            Console.Write('\n');
         }
 
         private static void DeleteEmployee(int indexEmployee,  ref string [] employees, ref string[] positions) 
@@ -184,6 +207,20 @@ namespace Personnel_accounting
                 tempArray[newIndex] = array[i];
                 newIndex++;
             }
+
+            array = tempArray;
+        }
+
+        private static void AddArrayItem(string item, ref string[] array)
+        {
+            string[] tempArray = new string[array.Length + 1];
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                tempArray[i] = array[i];
+            }
+
+            tempArray[tempArray.Length - 1] = item;
 
             array = tempArray;
         }
