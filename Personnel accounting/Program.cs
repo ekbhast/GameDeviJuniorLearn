@@ -12,13 +12,7 @@ namespace Personnel_accounting
             const string SearchLastnameCommand = "4";
             const string ExitCommand = "5";
 
-            const string AddItemMenuName = "Добавить сотрудника";
-            const string ShowAllItemMenuName = "Показать всех сотрудников";
-            const string DeleteItemMenuName = "Удалить сотрудника";
-            const string SearchLastnameItemMenuName = "Найти сотрудника  по фамилии";
-            const string ExitItemMenuName = "Выход";
-
-            string[] employees = 
+            string[] employees =
             {
                 "Гуров Тимофей Максимович",
                 "Скворцова Ульяна Андреевна",
@@ -37,24 +31,24 @@ namespace Personnel_accounting
 
             bool isExit = false;
 
-            while(isExit == false)
+            while (isExit == false)
             {
-                Console.WriteLine($"{AddCommand}. {AddItemMenuName}");
-                Console.WriteLine($"{ShowAllCommand}. {ShowAllItemMenuName}");
-                Console.WriteLine($"{DeleteCommand}. {DeleteItemMenuName}");
-                Console.WriteLine($"{SearchLastnameCommand}. {SearchLastnameItemMenuName}");
-                Console.WriteLine($"{ExitCommand}. {ExitItemMenuName}");
+                Console.WriteLine($"{AddCommand}. Добавить сотрудника");
+                Console.WriteLine($"{ShowAllCommand}. Показать всех сотрудников");
+                Console.WriteLine($"{DeleteCommand}. Удалить сотрудника");
+                Console.WriteLine($"{SearchLastnameCommand}. Найти сотрудника  по фамилии");
+                Console.WriteLine($"{ExitCommand}. Выход");
 
                 string userInput = Console.ReadLine();
 
-                switch (userInput) 
+                switch (userInput)
                 {
                     case AddCommand:
                         AddEmployee(ref employees, ref positions);
                         break;
 
                     case ShowAllCommand:
-                        ShowEmployees(FilterEmployees(employees), employees, positions);
+                        ShowAllEmployees(employees, positions);
                         break;
 
                     case DeleteCommand:
@@ -62,7 +56,7 @@ namespace Personnel_accounting
                         break;
 
                     case SearchLastnameCommand:
-                        SearchEmployee(ref employees, ref positions);
+                        SearchEmployee(employees, positions);
                         break;
 
                     case ExitCommand:
@@ -81,40 +75,38 @@ namespace Personnel_accounting
             Console.Clear();
             Console.WriteLine("Введите ФИО нового сутрудника, не менее 3х символов");
 
-            string newEmployee = CheckImputLength();
+            string newEmployee = ValildateImput();
 
             Console.Clear();
             Console.WriteLine("Введите должность сотрудника, не менее 3х символов");
 
-            string position = CheckImputLength();
+            string position = ValildateImput();
             CreateEmployee(newEmployee, position, ref employees, ref positions);
 
             Console.WriteLine("Сотрудник успешно добавлен!\n");
-            ShowEmployees(FilterEmployees(employees), employees, positions);
+            ShowAllEmployees(employees, positions);
         }
 
         private static void DeleteEmployee(ref string[] employees, ref string[] positions)
         {
             Console.Clear();
 
-            ShowEmployees(FilterEmployees(employees), employees, positions);
+            ShowAllEmployees(employees, positions);
 
             Console.Write("Введите порядковый номер сотрудника которго необходимо удалить: ");
 
             string inputIndex = Console.ReadLine();
+            bool isNumber = int.TryParse(inputIndex, out int employeeNumber);
 
-            int removeIndex;
-            bool isNumber = int.TryParse(inputIndex, out removeIndex);
-
-            if (isNumber && removeIndex > 0 && removeIndex <= employees.Length)
+            if (isNumber && employeeNumber > 0 && employeeNumber <= employees.Length)
             {
-                Console.WriteLine($"Вы выбрали сотрудника - {employees[removeIndex - 1]}");
-                DeleteEmployee(removeIndex, ref employees, ref positions);
+                Console.WriteLine($"Вы выбрали сотрудника - {employees[employeeNumber - 1]}");
+                DeleteEmployee(employeeNumber, ref employees, ref positions);
 
                 Console.Clear();
 
                 Console.WriteLine($"Все сотрудники:");
-                ShowEmployees(FilterEmployees(employees), employees, positions);
+                ShowAllEmployees(employees, positions);
             }
             else
             {
@@ -124,22 +116,22 @@ namespace Personnel_accounting
             Console.Write('\n');
         }
 
-        private static void SearchEmployee(ref string[] employees, ref string[] positions) 
+        private static void SearchEmployee(string[] employees, string[] positions)
         {
             Console.WriteLine("Введите Фамилию сотрудника для поиска");
 
             string inputLastnameEmployee = Console.ReadLine();
-            ShowEmployees(FilterEmployees(employees, inputLastnameEmployee), employees, positions);
+            ShowFilteredEmployees(FilterEmployees(employees, inputLastnameEmployee), employees, positions);
         }
 
-        private static void CreateEmployee(string newEmployee, string position, ref string[] employees, ref string[] positions) 
+        private static void CreateEmployee(string newEmployee, string position, ref string[] employees, ref string[] positions)
         {
             AddArrayItem(newEmployee, ref employees);
             AddArrayItem(position, ref positions);
             Console.Clear();
         }
 
-        private static void ShowEmployees(int[] filteredIndex, string[] employees, string[] positions)
+        private static void ShowFilteredEmployees(int[] filteredIndex, string[] employees, string[] positions)
         {
             Console.Clear();
 
@@ -160,7 +152,19 @@ namespace Personnel_accounting
 
         }
 
-        private static void DeleteEmployee(int indexEmployee,  ref string [] employees, ref string[] positions) 
+        private static void ShowAllEmployees(string[] employees, string[] positions)
+        {
+            Console.Clear();
+
+            for (int i = 0; i < employees.Length; i++)
+            {
+                Console.WriteLine($"{i + 1} - {employees[i]} - {positions[i]}");
+            }
+
+            Console.Write('\n');
+        }
+
+        private static void DeleteEmployee(int indexEmployee, ref string[] employees, ref string[] positions)
         {
             RemoveArrayItem(indexEmployee, ref employees);
             RemoveArrayItem(indexEmployee, ref positions);
@@ -170,12 +174,12 @@ namespace Personnel_accounting
         {
             string[] tempArray = new string[array.Length - 1];
 
-            for (int i = 0; i < removeIndex - 1; i++) 
+            for (int i = 0; i < removeIndex - 1; i++)
             {
                 tempArray[i] = array[i];
             }
 
-            for (int i = removeIndex; i < array.Length; i++) 
+            for (int i = removeIndex; i < array.Length; i++)
             {
                 tempArray[i - 1] = array[i];
             }
@@ -197,46 +201,32 @@ namespace Personnel_accounting
             array = tempArray;
         }
 
-        private static int[] FilterEmployees(string[] employees, string filterLastname = "all")
+        private static int[] FilterEmployees(string[] employees, string filterValue)
         {
             int[] filteredIndex = new int[0];
 
-            if (filterLastname == "all")
+            for (int i = 0; i < employees.Length; i++)
             {
-                filteredIndex = new int[employees.Length];
+                string lastname = employees[i].Split()[0];
 
-                for (int i = 0; i < filteredIndex.Length; i++)
+                if (lastname == filterValue)
                 {
-                    filteredIndex[i] = i;
-                }
+                    int[] tempFilteredIndex = new int[filteredIndex.Length + 1];
 
-                return filteredIndex;
-            } 
-            else
-            {
-                for (int i = 0; i <= employees.Length - 1 ; i++) 
-                {
-                    string lastname = employees[i].Split()[0];
-
-                    if (lastname == filterLastname)
+                    for (int j = 0; j < filteredIndex.Length - 1; j++)
                     {
-                        int[] tempFilteredIndex = new int[filteredIndex.Length + 1];
-
-                        for (int j = 0; j < filteredIndex.Length - 1; j++) 
-                        {
-                            tempFilteredIndex[j] = filteredIndex[j];
-                        }
-
-                        tempFilteredIndex[tempFilteredIndex.Length - 1] = i; 
-
-                        filteredIndex = tempFilteredIndex;
+                        tempFilteredIndex[j] = filteredIndex[j];
                     }
+
+                    tempFilteredIndex[tempFilteredIndex.Length - 1] = i;
+
+                    filteredIndex = tempFilteredIndex;
                 }
-                return filteredIndex;
             }
+            return filteredIndex;
         }
 
-        private static string CheckImputLength()
+        private static string ValildateImput()
         {
             string inputString = Console.ReadLine();
 
