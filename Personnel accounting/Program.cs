@@ -12,7 +12,7 @@ namespace Personnel_accounting
             const string SearchLastnameCommand = "4";
             const string ExitCommand = "5";
 
-            string[] employees =
+            string[] fullNames =
             {
                 "Гуров Тимофей Максимович",
                 "Скворцова Ульяна Андреевна",
@@ -44,19 +44,19 @@ namespace Personnel_accounting
                 switch (userInput)
                 {
                     case AddCommand:
-                        AddEmployee(ref employees, ref positions);
+                        AddEmployee(ref fullNames, ref positions);
                         break;
 
                     case ShowAllCommand:
-                        ShowAllEmployees(employees, positions);
+                        ShowAllEmployees(fullNames, positions);
                         break;
 
                     case DeleteCommand:
-                        DeleteEmployee(ref employees, ref positions);
+                        DeleteEmployee(ref fullNames, ref positions);
                         break;
 
                     case SearchLastnameCommand:
-                        SearchEmployee(employees, positions);
+                        SearchEmployee(fullNames, positions);
                         break;
 
                     case ExitCommand:
@@ -70,43 +70,46 @@ namespace Personnel_accounting
             }
         }
 
-        private static void AddEmployee(ref string[] employees, ref string[] positions)
+        private static void AddEmployee(ref string[] fullNames, ref string[] positions)
         {
             Console.Clear();
             Console.WriteLine("Введите ФИО нового сутрудника, не менее 3х символов");
 
-            string newEmployee = ValildateImput();
+            string newFullName = GetValidInput();
 
             Console.Clear();
             Console.WriteLine("Введите должность сотрудника, не менее 3х символов");
 
-            string position = ValildateImput();
-            CreateEmployee(newEmployee, position, ref employees, ref positions);
+            string newPosition = GetValidInput();
+
+            fullNames = AddArrayItem(newFullName, fullNames);
+            positions = AddArrayItem(newPosition, positions);
 
             Console.WriteLine("Сотрудник успешно добавлен!\n");
-            ShowAllEmployees(employees, positions);
+            ShowAllEmployees(fullNames, positions);
         }
 
-        private static void DeleteEmployee(ref string[] employees, ref string[] positions)
+        private static void DeleteEmployee(ref string[] fullNames, ref string[] positions)
         {
             Console.Clear();
 
-            ShowAllEmployees(employees, positions);
+            ShowAllEmployees(fullNames, positions);
 
             Console.Write("Введите порядковый номер сотрудника которго необходимо удалить: ");
 
             string inputIndex = Console.ReadLine();
             bool isNumber = int.TryParse(inputIndex, out int employeeNumber);
 
-            if (isNumber && employeeNumber > 0 && employeeNumber <= employees.Length)
+            if (isNumber && employeeNumber > 0 && employeeNumber <= fullNames.Length)
             {
-                Console.WriteLine($"Вы выбрали сотрудника - {employees[employeeNumber - 1]}");
-                DeleteEmployee(employeeNumber, ref employees, ref positions);
+                Console.WriteLine($"Вы выбрали сотрудника - {fullNames[employeeNumber - 1]}");
+                fullNames = RemoveArrayItem(employeeNumber, fullNames);
+                positions = RemoveArrayItem(employeeNumber, positions);
 
                 Console.Clear();
 
                 Console.WriteLine($"Все сотрудники:");
-                ShowAllEmployees(employees, positions);
+                ShowAllEmployees(fullNames, positions);
             }
             else
             {
@@ -116,22 +119,15 @@ namespace Personnel_accounting
             Console.Write('\n');
         }
 
-        private static void SearchEmployee(string[] employees, string[] positions)
+        private static void SearchEmployee(string[] fullNames, string[] positions)
         {
             Console.WriteLine("Введите Фамилию сотрудника для поиска");
 
             string inputLastnameEmployee = Console.ReadLine();
-            ShowFilteredEmployees(FilterEmployees(employees, inputLastnameEmployee), employees, positions);
+            ShowFilteredEmployees(FilterEmployees(fullNames, inputLastnameEmployee), fullNames, positions);
         }
 
-        private static void CreateEmployee(string newEmployee, string position, ref string[] employees, ref string[] positions)
-        {
-            AddArrayItem(newEmployee, ref employees);
-            AddArrayItem(position, ref positions);
-            Console.Clear();
-        }
-
-        private static void ShowFilteredEmployees(int[] filteredIndex, string[] employees, string[] positions)
+        private static void ShowFilteredEmployees(int[] filteredIndex, string[] fullNames, string[] positions)
         {
             Console.Clear();
 
@@ -143,34 +139,28 @@ namespace Personnel_accounting
             {
                 for (int i = 0; i < filteredIndex.Length; i++)
                 {
-                    Console.WriteLine($"{i + 1} - {employees[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
+                    Console.WriteLine($"{i + 1} - {fullNames[filteredIndex[i]]} - {positions[filteredIndex[i]]}");
                 }
+
                 Console.Write('\n');
             }
 
             Console.Write('\n');
-
         }
 
-        private static void ShowAllEmployees(string[] employees, string[] positions)
+        private static void ShowAllEmployees(string[] fullNames, string[] positions)
         {
             Console.Clear();
 
-            for (int i = 0; i < employees.Length; i++)
+            for (int i = 0; i < fullNames.Length; i++)
             {
-                Console.WriteLine($"{i + 1} - {employees[i]} - {positions[i]}");
+                Console.WriteLine($"{i + 1} - {fullNames[i]} - {positions[i]}");
             }
 
             Console.Write('\n');
         }
 
-        private static void DeleteEmployee(int indexEmployee, ref string[] employees, ref string[] positions)
-        {
-            RemoveArrayItem(indexEmployee, ref employees);
-            RemoveArrayItem(indexEmployee, ref positions);
-        }
-
-        private static void RemoveArrayItem(int removeIndex, ref string[] array)
+        private static string[] RemoveArrayItem(int removeIndex, string[] array)
         {
             string[] tempArray = new string[array.Length - 1];
 
@@ -184,10 +174,10 @@ namespace Personnel_accounting
                 tempArray[i - 1] = array[i];
             }
 
-            array = tempArray;
+            return tempArray;
         }
 
-        private static void AddArrayItem(string item, ref string[] array)
+        private static string[] AddArrayItem(string item, string[] array)
         {
             string[] tempArray = new string[array.Length + 1];
 
@@ -198,16 +188,16 @@ namespace Personnel_accounting
 
             tempArray[tempArray.Length - 1] = item;
 
-            array = tempArray;
+            return tempArray;
         }
 
-        private static int[] FilterEmployees(string[] employees, string filterValue)
+        private static int[] FilterEmployees(string[] fullNames, string filterValue)
         {
             int[] filteredIndex = new int[0];
 
-            for (int i = 0; i < employees.Length; i++)
+            for (int i = 0; i < fullNames.Length; i++)
             {
-                string lastname = employees[i].Split()[0];
+                string lastname = fullNames[i].Split()[0];
 
                 if (lastname == filterValue)
                 {
@@ -219,14 +209,14 @@ namespace Personnel_accounting
                     }
 
                     tempFilteredIndex[tempFilteredIndex.Length - 1] = i;
-
                     filteredIndex = tempFilteredIndex;
                 }
             }
+
             return filteredIndex;
         }
 
-        private static string ValildateImput()
+        private static string GetValidInput()
         {
             string inputString = Console.ReadLine();
 
