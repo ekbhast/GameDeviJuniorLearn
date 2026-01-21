@@ -7,7 +7,7 @@
     <ProjectGuid>{FCDC0CB5-0063-4FC7-9100-7BCEB691C2DC}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Brave_new_world</RootNamespace>
-    <AssemblyName>Brave_new_world</AssemblyName>
+    <AssemblyName>Brave new world</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
