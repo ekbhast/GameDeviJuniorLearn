@@ -31,7 +31,22 @@ namespace Brave_new_world
                 { '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', },
             };
 
-            ShowMap(map);
+            int characterPositionX = 1;
+            int characterPositionY = 1;
+
+            char characterView = '@';
+
+            while (true)
+            {
+                ShowMap(map);
+                ShowCharacter(characterPositionX, characterPositionY, characterView);
+                Console.ReadKey();
+
+                Console.Clear();
+                //ConsoleKeyInfo pressedKey = Console.ReadKey();
+            }
+
+            
         }
 
         private static void ShowMap(char[,] map)
@@ -45,6 +60,12 @@ namespace Brave_new_world
 
                 Console.Write('\n');
             }
+        }
+
+        private static void ShowCharacter(int characterPositionX, int characterPositionY, char characterView)
+        {   
+            Console.SetCursorPosition(characterPositionX, characterPositionY);
+            Console.Write(characterView);
         }
     }
 }
