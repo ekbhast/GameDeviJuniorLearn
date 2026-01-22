@@ -1,15 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-//TO DO
-//Сделать игровую карту с помощью двумерного массива. Сделать функцию показа карты в консоли.
-//Помимо этого, дать пользователю возможность перемещаться по карте и взаимодействовать с элементами
-//(например пользователь не может пройти сквозь стену).
-//Все элементы являются обычными символами.
-//Не используйте Task.Run.
 
 namespace Brave_new_world
 {
@@ -20,37 +9,37 @@ namespace Brave_new_world
             char[,] map = 
             { 
                 { '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', },
-                { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
-                { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
-                { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
-                { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
-                { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
+                { '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
+                { '#', '#', '#', '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
+                { '#', ' ', ' ', '#', ' ', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', },
+                { '#', ' ', ' ', '#', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', },
+                { '#', ' ', ' ', '#', '#', '#', '#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', },
                 { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
                 { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
                 { '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#', },
                 { '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', },
             };
+           
+            char characterView = '@';
 
             int characterPositionX = 1;
             int characterPositionY = 1;
 
-            char characterView = '@';
-
+            bool isInfinityLoop = true;
+            
             Console.CursorVisible = false;
 
-            while (true)
+            while (isInfinityLoop)
             {
                 ShowMap(map);
                 ShowCharacter(characterPositionX, characterPositionY, characterView);
 
-                ConsoleKeyInfo pressedKey = Console.ReadKey();
-
-                MoveCharacter(pressedKey, ref characterPositionX, ref characterPositionY);
+                ConsoleKeyInfo pressedKey = Console.ReadKey(true);
+                
+                MovePlayer(GetDirection(pressedKey.Key),ref characterPositionX,  ref characterPositionY, map);
 
                 Console.Clear();
             }
-
-            
         }
 
         private static void ShowMap(char[,] map)
@@ -69,31 +58,53 @@ namespace Brave_new_world
         private static void ShowCharacter(int characterPositionX, int characterPositionY, char characterView)
         {   
             Console.SetCursorPosition(characterPositionX, characterPositionY);
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(characterView);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        
+        private static int [] GetDirection(ConsoleKey pressedKey)
+        {
+            const ConsoleKey UpCommand = ConsoleKey.UpArrow;
+            const ConsoleKey DownCommand = ConsoleKey.DownArrow;
+            const ConsoleKey LeftCommand = ConsoleKey.LeftArrow;
+            const ConsoleKey RightCommand = ConsoleKey.RightArrow;
+
+            int[] direction = { 0, 0 };
+                        
+            switch (pressedKey)
+            {
+                case UpCommand:
+                    direction[1] = -1;
+                    break;
+
+                case DownCommand:
+                    direction[1] = +1;
+                    break;
+
+                case LeftCommand:
+                    direction[0] = -1;
+                    break;
+
+                case RightCommand:
+                    direction[0] = +1;
+                    break;
+            }
+
+            return direction;
         }
 
-        private static void MoveCharacter(ConsoleKeyInfo pressedKey, ref int characterPositionX, ref int characterPositionY)
-        {
-            switch (pressedKey.Key)
+        private static void MovePlayer(int[] direction, ref int characterPositionX, ref int characterPositionY, char[,] map)
+        {            
+            int nextCharacterPositionX = characterPositionX + direction[0];
+            int nextcharacterPositionY = characterPositionY + direction[1];
+
+            char nextCell = map[nextcharacterPositionY, nextCharacterPositionX];
+    
+            if (nextCell == ' ')
             {
-                case ConsoleKey.UpArrow:
-                    characterPositionY -= 1;
-                    break;
-
-                case ConsoleKey.DownArrow:
-                    characterPositionY += 1;
-                    break;
-
-                case ConsoleKey.LeftArrow:
-                    characterPositionX -= 1;
-                    break;
-
-                case ConsoleKey.RightArrow:
-                    characterPositionX += 1;
-                    break;
-
-                default:
-                    break;
+                characterPositionX = nextCharacterPositionX;
+                characterPositionY = nextcharacterPositionY;
             }
         }
     }
