@@ -36,14 +36,18 @@ namespace Brave_new_world
 
             char characterView = '@';
 
+            Console.CursorVisible = false;
+
             while (true)
             {
                 ShowMap(map);
                 ShowCharacter(characterPositionX, characterPositionY, characterView);
-                Console.ReadKey();
+
+                ConsoleKeyInfo pressedKey = Console.ReadKey();
+
+                MoveCharacter(pressedKey, ref characterPositionX, ref characterPositionY);
 
                 Console.Clear();
-                //ConsoleKeyInfo pressedKey = Console.ReadKey();
             }
 
             
@@ -66,6 +70,31 @@ namespace Brave_new_world
         {   
             Console.SetCursorPosition(characterPositionX, characterPositionY);
             Console.Write(characterView);
+        }
+
+        private static void MoveCharacter(ConsoleKeyInfo pressedKey, ref int characterPositionX, ref int characterPositionY)
+        {
+            switch (pressedKey.Key)
+            {
+                case ConsoleKey.UpArrow:
+                    characterPositionY -= 1;
+                    break;
+
+                case ConsoleKey.DownArrow:
+                    characterPositionY += 1;
+                    break;
+
+                case ConsoleKey.LeftArrow:
+                    characterPositionX -= 1;
+                    break;
+
+                case ConsoleKey.RightArrow:
+                    characterPositionX += 1;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }
