@@ -20,6 +20,7 @@
     <Project Path="ConsoleApp1/Queue at the store.csproj" Id="d356b6f8-8bf2-408e-a039-8cda8729c117" />
     <Project Path="dictionary/dictionary.csproj" Id="99d4d49c-1c11-4982-b40d-694f09edf209" />
     <Project Path="Extanded Dynamic Arrow/Extanded Dynamic Arrow.csproj" Id="477a3eb5-1eb2-4e06-aef9-d2e90904eb23" />
+    <Project Path="Extended Personnel accounting/Extended Personnel accounting.csproj" Id="edfa53b0-6ed0-47a1-a26c-bee1f6d41a86" />
   </Folder>
   <Folder Name="/pacman/">
     <Project Path="pacman/pacman.csproj" Id="8d06463c-4c7e-4425-9ba6-27c561dd96fc" />
