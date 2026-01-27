@@ -94,6 +94,7 @@ namespace Extended_Personnel_accounting
             else 
             {   
                 AddPosition(employees, position);
+                AddFullName(employees, position);
             }
         }
 
@@ -111,7 +112,6 @@ namespace Extended_Personnel_accounting
         {
             employees.Add(position, new List<string>());
             Console.WriteLine($"Должность {position} не была найдена и была добавлена в базу");
-            AddFullName(employees, position);
         }
 
         private static void ShowAllEmployees(Dictionary<string, List<string>> employees)
