@@ -6,32 +6,71 @@ namespace lectures
     {
         static void Main(string[] args)
         {
-            DrawBar(5, 10, 1, ConsoleColor.Green);
-            DrawBar(6, 10, 2, ConsoleColor.Blue);
+            Table[] tables = { new Table(1, 4), new Table(2, 8), new Table(3, 10) };
+
+            bool isOpen = true;
+
+            while (isOpen == true)
+            {
+                Console.WriteLine("Администрирование кафе. \n");
+
+                foreach (Table table in tables)
+                {
+                    table.ShowInfo();
+                }
+
+                Console.WriteLine("Введите номер стола: ");
+                int wishTable = Convert.ToInt32(Console.ReadLine()) - 1;
+
+                Console.WriteLine("Введите количество мест для брони:");
+                int disiredPlaces = Convert.ToInt32(Console.ReadLine());
+
+                bool isReservationCompleted = tables[wishTable].Reserve(disiredPlaces); 
+
+                if (isReservationCompleted == true)
+                {
+                    Console.WriteLine("Бронь прошла успешно");
+                }
+                else
+                {
+                    Console.WriteLine("Бронь не пршла. Не достаточно мест");
+                }
+
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+    }
+
+    class Table
+    {
+        public int Number;
+        public int MaxPlaces;
+        public int FreePlaces;
+
+        public Table(int number, int maxPlaces)
+        {
+            Number = number;
+            MaxPlaces = maxPlaces;
+            FreePlaces = maxPlaces;
         }
 
-        static void DrawBar (int value, int maxValue, int position, ConsoleColor color)
+        public void ShowInfo()
         {
-            ConsoleColor defaultColor = Console.BackgroundColor;
-            
-            Console.SetCursorPosition(0, position);
+            Console.WriteLine($"Стол: {Number}, свободно мест: {FreePlaces}, из {MaxPlaces} ");
+        }
 
-            Console.Write('[');
-
-            Console.BackgroundColor = color;
-
-            for (int i = 0; i <= value; i++) 
+        public bool Reserve(int places)
+        {
+            if (FreePlaces >= places)
             {
-                Console.Write(' ');
+                FreePlaces -= places;
+                return true;
             }
-
-            Console.BackgroundColor = defaultColor;
-
-            for (int i = value; i <= maxValue; i++) { 
-                Console.Write(" ");
+            else
+            {
+                return false;
             }
-
-            Console.WriteLine(']');
         }
     }
 }

@@ -87,15 +87,13 @@ namespace Extended_Personnel_accounting
             Console.WriteLine("Введите должность нового сотрудника");
             string position = Console.ReadLine();
 
-            if (employees.ContainsKey(position))
+            if (employees.ContainsKey(position) == false)
             {
-                AddFullName(employees, position);
-            }
-            else 
-            {   
                 AddPosition(employees, position);
-                AddFullName(employees, position);
             }
+
+            AddFullName(employees, position);
+            
         }
 
         private static void AddFullName(Dictionary<string, List<string>> employees, string position)
@@ -136,8 +134,9 @@ namespace Extended_Personnel_accounting
 
             foreach (var position in employees.Keys) 
             { 
-                bool result = employees[position].Remove(fullName);
-                if (result == true)
+                bool canDelete = employees[position].Remove(fullName);
+
+                if (canDelete == true)
                 {
                     Console.WriteLine("Сотрудник удален");
                     DeleteEmptyPosition(employees, position);
