@@ -16,6 +16,18 @@
   <Folder Name="/lectures/">
     <Project Path="lectures/lectures.csproj" Id="e9187fa6-b325-49b7-90a0-9cf2358769ae" />
   </Folder>
+  <Folder Name="/lectures/OOP/">
+    <Project Path="abstract  class/abstract  class.csproj" Id="f56e5748-45d3-461d-9d53-84c4cd9b022e" />
+    <Project Path="Collection Link/Collection Link.csproj" Id="f53a8309-e726-4c22-8bcc-35a29d34001a" />
+    <Project Path="fight warrior on class/fight warrior on class.csproj" Id="a2a2304a-da47-47f0-a6a8-fbbf119b161b" />
+    <Project Path="game loop/game loop.csproj" Id="f46e101b-9a3a-4c31-80ea-29e7e5a78888" />
+    <Project Path="has-a/has-a.csproj" Id="22e08215-3066-44d3-aaaf-76b7e58faf65" />
+    <Project Path="interface/interface.csproj" Id="00270699-e781-45f6-a329-378511afd08a" />
+    <Project Path="is - a/is - a.csproj" Id="1dd379e0-0f3a-47dd-9f8c-eca5dd9a49e6" />
+    <Project Path="options/options.csproj" Id="2dddcd4a-1dfb-4bf5-b235-ac7ea6803cb1" />
+    <Project Path="static member/static member.csproj" Id="0ccc96b7-4030-40c9-8ac7-4a11d4761c84" />
+    <Project Path="virtual method/virtual method.csproj" Id="bebb3ea5-fd03-42cc-87f7-a96907cec05f" />
+  </Folder>
   <Folder Name="/lists/">
     <Project Path="ConsoleApp1/Queue at the store.csproj" Id="d356b6f8-8bf2-408e-a039-8cda8729c117" />
     <Project Path="dictionary/dictionary.csproj" Id="99d4d49c-1c11-4982-b40d-694f09edf209" />
