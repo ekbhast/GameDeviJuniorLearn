@@ -19,6 +19,7 @@
   <Folder Name="/lectures/OOP/">
     <Project Path="abstract  class/abstract  class.csproj" Id="f56e5748-45d3-461d-9d53-84c4cd9b022e" />
     <Project Path="Collection Link/Collection Link.csproj" Id="f53a8309-e726-4c22-8bcc-35a29d34001a" />
+    <Project Path="Computer Club/Computer Club.csproj" Id="acc498ad-9740-44e6-a2d6-d02bf8152177" />
     <Project Path="fight warrior on class/fight warrior on class.csproj" Id="a2a2304a-da47-47f0-a6a8-fbbf119b161b" />
     <Project Path="game loop/game loop.csproj" Id="f46e101b-9a3a-4c31-80ea-29e7e5a78888" />
     <Project Path="has-a/has-a.csproj" Id="22e08215-3066-44d3-aaaf-76b7e58faf65" />
@@ -34,6 +35,9 @@
     <Project Path="Extanded Dynamic Arrow/Extanded Dynamic Arrow.csproj" Id="477a3eb5-1eb2-4e06-aef9-d2e90904eb23" />
     <Project Path="Extended Personnel accounting/Extended Personnel accounting.csproj" Id="edfa53b0-6ed0-47a1-a26c-bee1f6d41a86" />
     <Project Path="Merging in one collection/Merging in one collection.csproj" Id="66b6f4c4-d0a8-40e3-96b8-13e22d5da800" />
+  </Folder>
+  <Folder Name="/loop and logic operators/">
+    <Project Path="fight boss/fight boss.csproj" Id="6afeadc5-e80f-42c0-b071-8e8335716b47" />
   </Folder>
   <Folder Name="/pacman/">
     <Project Path="pacman/pacman.csproj" Id="8d06463c-4c7e-4425-9ba6-27c561dd96fc" />
