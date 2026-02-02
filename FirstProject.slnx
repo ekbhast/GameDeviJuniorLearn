@@ -36,6 +36,9 @@
     <Project Path="Extended Personnel accounting/Extended Personnel accounting.csproj" Id="edfa53b0-6ed0-47a1-a26c-bee1f6d41a86" />
     <Project Path="Merging in one collection/Merging in one collection.csproj" Id="66b6f4c4-d0a8-40e3-96b8-13e22d5da800" />
   </Folder>
+  <Folder Name="/loop and logic operators/">
+    <Project Path="fight boss/fight boss.csproj" Id="6afeadc5-e80f-42c0-b071-8e8335716b47" />
+  </Folder>
   <Folder Name="/pacman/">
     <Project Path="pacman/pacman.csproj" Id="8d06463c-4c7e-4425-9ba6-27c561dd96fc" />
   </Folder>

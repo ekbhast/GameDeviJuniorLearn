@@ -30,7 +30,6 @@ namespace pacman
             {
                 Console.Clear();
 
-                Console.ForegroundColor = ConsoleColor.Blue;
                 DrawMap(map);
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -71,7 +70,17 @@ namespace pacman
             {
                 for (int column = 0; column < map.GetLength(0); column++)
                 {
-                    Console.Write(map[column, line]);
+                    if (map[column, line] == '.')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write(map[column, line]);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write(map[column, line]);
+                    }
+
                 }
 
                 Console.Write("\n");
