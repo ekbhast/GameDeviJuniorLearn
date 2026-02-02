@@ -16,19 +16,19 @@ namespace worcking_with_property
     {
         private int _positionX;
         private int _positionY;
-        private char _playerChar;
+        private char _displayChar;
 
-        public Player (int positionX, int positionY, char playerChar)
+        public Player (int positionX, int positionY, char displayChar)
         {
             _positionX = positionX;
             _positionY = positionY;
-            _playerChar = playerChar;
+            _displayChar = displayChar;
         }
 
         public void Draw()
         {
             Console.SetCursorPosition(_positionX, _positionY);
-            Console.Write(_playerChar);
+            Console.Write(_displayChar);
         }
     }
 }
