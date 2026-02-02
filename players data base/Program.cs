@@ -1,14 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-//Реализовать базу данных игроков и методы для работы с ней. Должно быть консольное меню для взаимодействия пользователя с возможностями базы данных.
-//Игрок должен состоять из уникального номера, ника, уровня и булевого значения, забанен ли игрок.
-//Реализовать возможность добавления игрока, бана игрока по уникальному номеру, разбана игрока по уникальному номеру и удаление игрока по уникальному номеру.
-
-//Создавать полноценные системы баз данных не нужно, задание выполняется инструментами, которые вы уже изучили в рамках курса. Надо сделать класс "База данных".
 
 namespace players_data_base
 {
@@ -16,11 +7,117 @@ namespace players_data_base
     {
         static void Main(string[] args)
         {
-        }
-    }
+            const int AddCommand = 1;
+            const int BanCommand = 2;
+            const int UnbanCommand = 3;
+            const int ShowPlayersCommand = 4;
+            const int DeleteCommand = 5;
+            const int ExitCommand = 6;
 
-    class DataBase
-    {
-        
+            bool isExit = false;
+
+            while (isExit == false)
+            {
+                Console.Clear();
+
+                Console.WriteLine($"{AddCommand}. Добавить игрока.");
+                Console.WriteLine($"{BanCommand}. Забанить игрока.");
+                Console.WriteLine($"{UnbanCommand}. Разбанить игрока.");
+                Console.WriteLine($"{DeleteCommand}. Удалить игрока.");
+                Console.WriteLine($"{ExitCommand}. Выход.");
+
+                DataBase dataBase = new DataBase();
+
+                string userInput = Console.ReadLine();
+
+                if (int.TryParse(userInput, out int command))
+                {
+                    switch (command)
+                    {
+                        case AddCommand:
+                            dataBase.AddPlayer();
+                            break;
+
+                        case BanCommand:
+                            Console.WriteLine(BanCommand);
+                            break;
+
+                        case UnbanCommand:
+                            Console.WriteLine(UnbanCommand);
+                            break;
+
+                        case ShowPlayersCommand:
+                            dataBase.ShowPlayers();
+                            break;
+
+                        case DeleteCommand:
+                            Console.WriteLine(DeleteCommand);
+                            break;
+
+                        case ExitCommand:
+                            isExit = true;
+                            break;
+
+                        default:
+                            Console.WriteLine("Такой команды не существует.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Вы ввели не число.");
+                }
+
+                Console.ReadKey();
+            }
+        }
+
+        class DataBase
+        {
+            public List<Player> Players { get; private set; }
+            public void AddPlayer(Player player)
+            {
+                Players.Add(player);
+            }
+
+            public void BanPlayer()
+            {
+
+            }
+
+            public void UnbanPlayer()
+            {
+
+            }
+
+            public void DeletePlayer()
+            {
+
+            }
+
+            public void ShowPlayers()
+            {
+                foreach (Player p in Players)
+                {
+                    Console.WriteLine($"ID - {p.Id}, NickName - {p.NickName}, Level - {p.Level}, Ban status - {p.IsBanned}");
+                }
+            }
+
+
+        }
+        class Player
+        {
+            public Player(int id, string nickName, int level, bool isBanned = false)
+            {
+                Id = id;
+                NickName = nickName;
+                Level = level;
+                IsBanned = isBanned;
+            }
+            public int Id { get; private set; }
+            public string NickName { get; private set; }
+            public int Level { get; private set; }
+            public bool IsBanned { get; private set; }
+        }
     }
 }

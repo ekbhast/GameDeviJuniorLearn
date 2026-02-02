@@ -8,27 +8,31 @@ namespace worcking_with_property
         {
             Player player = new Player(1, 1, '@');
 
-            player.Draw();
+            Renderer renderer = new Renderer();
+            renderer.Render(player);
         }
     }
 
     class Player
     {
-        private int _positionX;
-        private int _positionY;
-        private char _displayChar;
+        public int PositionX { get; private set; }
+        public int PositionY { get; private set; }
+        public char Character { get; private set; }
 
-        public Player (int positionX, int positionY, char displayChar)
+        public Player (int positionX, int positionY, char character)
         {
-            _positionX = positionX;
-            _positionY = positionY;
-            _displayChar = displayChar;
+            PositionX = positionX;
+            PositionY = positionY;
+            Character = character;
         }
+    }
 
-        public void Draw()
+    class Renderer
+    {
+        public void Render(Player player)
         {
-            Console.SetCursorPosition(_positionX, _positionY);
-            Console.Write(_displayChar);
+            Console.SetCursorPosition(player.PositionX, player.PositionY);
+            Console.Write(player.Character);
         }
     }
 }
