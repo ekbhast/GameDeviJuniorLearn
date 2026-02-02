@@ -39,8 +39,11 @@
   <Folder Name="/loop and logic operators/">
     <Project Path="fight boss/fight boss.csproj" Id="6afeadc5-e80f-42c0-b071-8e8335716b47" />
   </Folder>
+  <Folder Name="/OOP home works/">
+    <Project Path="worcking with property/worcking with property.csproj" Id="424cb3ea-fe78-4d54-a2d3-fe3162142e83" />
+    <Project Path="working with classes/working with classes.csproj" Id="ae3920ef-6d35-4e7c-a652-b9454baa8cef" />
+  </Folder>
   <Folder Name="/pacman/">
     <Project Path="pacman/pacman.csproj" Id="8d06463c-4c7e-4425-9ba6-27c561dd96fc" />
   </Folder>
-  <Folder Name="/Новая папка1/" />
 </Solution>
