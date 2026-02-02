@@ -7,7 +7,7 @@
     <ProjectGuid>{ACC498AD-9740-44E6-A2D6-D02BF8152177}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Computer_Club</RootNamespace>
-    <AssemblyName>Computer_Club</AssemblyName>
+    <AssemblyName>Computer Club</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
