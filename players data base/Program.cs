@@ -8,9 +8,8 @@ namespace players_data_base
         static void Main(string[] args)
         {
             Database database = new Database();
-            PlayerCreator creator = new PlayerCreator();
+            PlayerFactory creator = new PlayerFactory();
             Menu menu = new Menu();
-            Service playerService = new Service(database, creator);
 
             bool isExit = false;
 
@@ -22,15 +21,15 @@ namespace players_data_base
                 switch (command)
                 {
                     case Menu.AddCommand:
-                        playerService.AddPlayer();
+                        database.AddPlayer(creator);
                         break;
 
                     case Menu.BanCommand:
-                        playerService.BanPlayer();
+                        database.BanPlayer();
                         break;
 
                     case Menu.UnbanCommand:
-                        playerService.UnbanPlayer();
+                        database.UnbanPlayer();
                         break;
 
                     case Menu.ShowPlayersCommand:
@@ -38,11 +37,10 @@ namespace players_data_base
                         break;
 
                     case Menu.DeleteCommand:
-                        playerService.DeletePlayer();
+                        database.DeletePlayer();
                         break;
 
                     case Menu.ExitCommand:
-                        Console.WriteLine("Выход");
                         isExit = true;
                         break;
 
@@ -51,9 +49,11 @@ namespace players_data_base
                         break;
                 }
 
-                Console.WriteLine("Нажмите любую клавиша для продолжения");
+                Console.WriteLine("Нажмите любую клавишу для продолжения");
                 Console.ReadKey();
             }
+
+            Console.WriteLine("Выход");
         }
     }
 
@@ -80,7 +80,7 @@ namespace players_data_base
 
         public int GetCommand()
         {
-            int command = GetterNumber.GetNumber("Введите номер команды:");
+            int command = UserUtils.ReadInt("Введите номер команды:");
 
             return command;
         }
@@ -88,31 +88,93 @@ namespace players_data_base
 
     class Database
     {
-        public Dictionary<int, Player> Players { get; private set; } = new Dictionary<int, Player>();
+        private Dictionary<int, Player> _players = new Dictionary<int, Player>();
+        private int _lastId = 0;
 
-        public void AddPlayer(int id, Player player)
+        public void AddPlayer(PlayerFactory playerFactory)
         {
-            Players.Add(id, player);
+            Player player = playerFactory.Create(_lastId);
+            _players.Add(player.Id, player);
+            _lastId++;
+
+            player.ShowInfo();
         }
 
-        public void DeletePlayer(int id)
+        public void DeletePlayer()
         {
-            Players.Remove(id);
+            if (TryGetPlayer(out Player player))
+            {
+                _players.Remove(player.Id);
+                Console.WriteLine($"Игрок с ID {player.Id} удален из базы");
+            }
+            else
+            {
+                Console.WriteLine("Игрока с таким ID не существует.");
+            }
+        }
+
+        public void UnbanPlayer()
+        {
+            if (TryGetPlayer(out Player player))
+            {
+                if (player.IsBanned == false)
+                {
+                    Console.WriteLine("Игрок уже разбанен");
+                }
+                else
+                {
+                    player.Unban();
+                    Console.WriteLine($"Игрок c ID {player.Id} - разбанeн.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Игрока с таким ID не существует.");
+            }
+        }
+
+        public void BanPlayer()
+        {
+            if (TryGetPlayer(out Player player))
+            {
+                if (player.IsBanned)
+                {
+                    Console.WriteLine("Игрок уже забанен");
+                }
+                else
+                {
+                    player.Ban();
+                    Console.WriteLine($"Игрок c ID {player.Id} - забанен.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Игрока с таким ID не существует.");
+            }
         }
 
         public void ShowPlayers()
         {
-            foreach (Player player in Players.Values)
+            if (_players.Count == 0)
             {
-                player.GetInfo();
+                Console.WriteLine("Игроков в базе нет");
+            }
+            else
+            {
+                foreach (Player player in _players.Values)
+                {
+                    player.ShowInfo();
+                }
             }
         }
 
-        public bool TryGetPlayer(int id, out Player player)
+        public bool TryGetPlayer(out Player player)
         {
-            if (Players.ContainsKey(id))
+            int id = UserUtils.ReadInt("Введите ID игрока:");
+
+            if (_players.ContainsKey(id))
             {
-                player = Players[id];
+                player = _players[id];
                 return true;
             }
             else
@@ -148,116 +210,30 @@ namespace players_data_base
             IsBanned = false;
         }
 
-        public void GetInfo()
+        public void ShowInfo()
         {
             Console.WriteLine($"ID - {Id}, NickName - {NickName}, Level - {Level}, Ban status - {IsBanned}");
         }
     }
 
-    class PlayerCreator
+    class PlayerFactory
     {
-        public Player Create()
+        public Player Create(int lastId)
         {
-            int id = GetterNumber.GetNumber("Введите уникальный ИД:");
+            int id = lastId;
 
             Console.WriteLine("Введите ник:");
             string nick = Console.ReadLine();
 
-            int level = GetterNumber.GetNumber("Введите уровень:");
+            int level = UserUtils.ReadInt("Введите уровень:");
 
             return new Player(id, nick, level);
         }
     }
 
-    class Service
+    static class UserUtils
     {
-        private Database _database;
-        private PlayerCreator _playerCreator;
-
-        public Service(Database database, PlayerCreator playerCreator)
-        {
-            _database = database;
-            _playerCreator = playerCreator;
-        }
-
-        public void AddPlayer()
-        {
-            Player player = _playerCreator.Create();
-
-            if (_database.TryGetPlayer(player.Id, out Player findedPlayer))
-            {
-                Console.WriteLine("Игрок под таким ID уже существует.");
-            }
-            else
-            {
-                _database.AddPlayer(player.Id, player);
-                player.GetInfo();
-            }
-        }
-
-        public void BanPlayer()
-        {
-            int id = GetterNumber.GetNumber("Введите ID игрока, которого необходимо забанить:");
-
-            if (_database.TryGetPlayer(id, out Player player))
-            {
-                if (player.IsBanned == true)
-                {
-                    Console.WriteLine("Игрок уже забанен");
-                }
-                else
-                {
-                    player.Ban();
-                    Console.WriteLine($"Игрок c ID {player.Id} - забанен.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Игрока с таким ID не существует.");
-            }
-        }
-
-        public void UnbanPlayer()
-        {
-            int id = GetterNumber.GetNumber("Введите ID игрока, которого необходимо разбанить");
-
-            if (_database.TryGetPlayer(id, out Player player))
-            {
-                if (player.IsBanned == false)
-                {
-                    Console.WriteLine("Игрок уже разбанен");
-                }
-                else
-                {
-                    player.Unban();
-                    Console.WriteLine($"Игрок c ID {player.Id} - разбанeн.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Игрока с таким ID не существует.");
-            }
-        }
-
-        public void DeletePlayer()
-        {
-            int id = GetterNumber.GetNumber("Введите ID игрока, которого необходимо удалить:");
-
-            if (_database.TryGetPlayer(id, out Player player))
-            {
-                _database.DeletePlayer(player.Id);
-                Console.WriteLine($"Игрок с ID {player.Id} удален из базы");
-            }
-            else
-            {
-                Console.WriteLine("Игрока с таким ID не существует.");
-            }
-        }
-    }
-
-    static class GetterNumber
-    {
-        public static int GetNumber(string prompt)
+        public static int ReadInt(string prompt)
         {
             int number = 0;
             bool isNumber = false;
