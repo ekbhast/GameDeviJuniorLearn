@@ -7,10 +7,10 @@ namespace players_data_base
     {
         static void Main(string[] args)
         {
-            DataBase dataBase = new DataBase();
+            Database database = new Database();
             PlayerCreator creator = new PlayerCreator();
             Menu menu = new Menu();
-            Service playerService = new Service(dataBase, creator);
+            Service playerService = new Service(database, creator);
 
             bool isExit = false;
 
@@ -34,7 +34,7 @@ namespace players_data_base
                         break;
 
                     case Menu.ShowPlayersCommand:
-                        dataBase.ShowPlayers();
+                        database.ShowPlayers();
                         break;
 
                     case Menu.DeleteCommand:
@@ -86,18 +86,13 @@ namespace players_data_base
         }
     }
 
-    class DataBase
+    class Database
     {
-        public Dictionary<int, Player> Players = new Dictionary<int, Player>();
+        public Dictionary<int, Player> Players { get; private set; } = new Dictionary<int, Player>();
 
         public void AddPlayer(int id, Player player)
         {
             Players.Add(id, player);
-        }
-
-        public bool IsUniqueId(Player player)
-        {
-            return Players.ContainsKey(player.Id) == false;
         }
 
         public void DeletePlayer(int id)
@@ -113,7 +108,19 @@ namespace players_data_base
             }
         }
 
-
+        public bool TryGetPlayer(int id, out Player player)
+        {
+            if (Players.ContainsKey(id))
+            {
+                player = Players[id];
+                return true;
+            }
+            else
+            {
+                player = null;
+                return false;
+            }
+        }
     }
 
     class Player
@@ -164,12 +171,12 @@ namespace players_data_base
 
     class Service
     {
-        private DataBase _dataBase;
+        private Database _database;
         private PlayerCreator _playerCreator;
 
-        public Service(DataBase dataBase, PlayerCreator playerCreator)
+        public Service(Database database, PlayerCreator playerCreator)
         {
-            _dataBase = dataBase;
+            _database = database;
             _playerCreator = playerCreator;
         }
 
@@ -177,14 +184,14 @@ namespace players_data_base
         {
             Player player = _playerCreator.Create();
 
-            if (_dataBase.IsUniqueId(player))
+            if (_database.TryGetPlayer(player.Id, out Player findedPlayer))
             {
-                _dataBase.AddPlayer(player.Id, player);
-                player.GetInfo();
+                Console.WriteLine("Игрок под таким ID уже существует.");
             }
             else
             {
-                Console.WriteLine("Игрок под таким ID уже существует.");
+                _database.AddPlayer(player.Id, player);
+                player.GetInfo();
             }
         }
 
@@ -192,16 +199,16 @@ namespace players_data_base
         {
             int id = GetterNumber.GetNumber("Введите ID игрока, которого необходимо забанить:");
 
-            if (_dataBase.Players.ContainsKey(id))
+            if (_database.TryGetPlayer(id, out Player player))
             {
-                if (_dataBase.Players[id].IsBanned == true)
+                if (player.IsBanned == true)
                 {
                     Console.WriteLine("Игрок уже забанен");
                 }
                 else
                 {
-                    _dataBase.Players[id].Ban();
-                    Console.WriteLine($"Игрок c ID {_dataBase.Players[id].Id} - забанен.");
+                    player.Ban();
+                    Console.WriteLine($"Игрок c ID {player.Id} - забанен.");
                 }
             }
             else
@@ -214,16 +221,16 @@ namespace players_data_base
         {
             int id = GetterNumber.GetNumber("Введите ID игрока, которого необходимо разбанить");
 
-            if (_dataBase.Players.ContainsKey(id))
+            if (_database.TryGetPlayer(id, out Player player))
             {
-                if (_dataBase.Players[id].IsBanned == false)
+                if (player.IsBanned == false)
                 {
                     Console.WriteLine("Игрок уже разбанен");
                 }
                 else
                 {
-                    _dataBase.Players[id].Unban();
-                    Console.WriteLine($"Игрок c ID {_dataBase.Players[id].Id} - разбанить.");
+                    player.Unban();
+                    Console.WriteLine($"Игрок c ID {player.Id} - разбанeн.");
                 }
             }
             else
@@ -236,10 +243,10 @@ namespace players_data_base
         {
             int id = GetterNumber.GetNumber("Введите ID игрока, которого необходимо удалить:");
 
-            if (_dataBase.Players.ContainsKey(id))
+            if (_database.TryGetPlayer(id, out Player player))
             {
-                _dataBase.DeletePlayer(id);
-                Console.WriteLine($"Игрок с ID {id} удален из базы");
+                _database.DeletePlayer(player.Id);
+                Console.WriteLine($"Игрок с ID {player.Id} удален из базы");
             }
             else
             {
@@ -252,16 +259,19 @@ namespace players_data_base
     {
         public static int GetNumber(string prompt)
         {
-            while (true)
+            int number = 0;
+            bool isNumber = false;
+
+            while (isNumber == false)
             {
                 Console.WriteLine(prompt);
                 string inputUser = Console.ReadLine();
 
-                if (int.TryParse(inputUser, out int number))
+                if (int.TryParse(inputUser, out number))
                     return number;
-
-                Console.WriteLine("Введено не число!\n");
             }
+
+            return number;
         }
     }
 }
