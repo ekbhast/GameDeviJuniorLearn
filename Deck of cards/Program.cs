@@ -14,21 +14,21 @@ namespace Deck_of_cards
 
     class Dealer
     {
-        private Deck _deck  ;
+        private Deck _deck;
         private Player _player;
 
         public Dealer()
         {
             DeckFactory deckFactory = new DeckFactory();
-            _deck = new Deck(deckFactory.GetNewDeck());
+            _deck = new Deck(deckFactory.GetNew());
             _player = new Player();
         }
 
-        public void DealCards(int numberOfCards)
+        public void GiveCards(int numberOfCards)
         {
             for (int i = 0; i < numberOfCards; i++)
             {
-                _player.ReceiveCard(_deck.DealCard());
+                _player.ReceiveCard(_deck.GiveCard());
             }
         }
 
@@ -48,7 +48,7 @@ namespace Deck_of_cards
                     }
                     else
                     {
-                        DealCards(numberOfCards);
+                        GiveCards(numberOfCards);
                         _deck.ShowCards();
                         _player.ShowCards();
                     }
@@ -69,21 +69,13 @@ namespace Deck_of_cards
         {
             foreach (Card card in cards)
             {
-                _cards.Push(card);
+                _cards.Push(new Card(card.Name, card.Suit));
             }
         }
 
-        public int Size
-        {
-            get { return _cards.Count; }
-        }
+        public int Size => _cards.Count;
 
-        public void AddCard(Card card)
-        {
-            _cards.Push(card);
-        }
-
-        public Card DealCard()
+        public Card GiveCard()
         {
             return _cards.Pop();
         }
@@ -118,7 +110,7 @@ namespace Deck_of_cards
             _cards.Add(new Card("Пятёрка", "Бубны"));
         }
 
-        public List<Card> GetNewDeck()
+        public List<Card> GetNew()
         {
             return _cards;
         }
