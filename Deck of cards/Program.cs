@@ -6,7 +6,7 @@ namespace Deck_of_cards
     internal class Program
     {
         static void Main(string[] args)
-        {   
+        {
             Dealer dealer = new Dealer();
             dealer.Play();
         }
@@ -14,32 +14,26 @@ namespace Deck_of_cards
 
     class Dealer
     {
-        private DeckOfCard _deckOfCard = new DeckOfCard();
+        private Deck _deck  ;
         private Player _player;
 
         public Dealer()
         {
-            _deckOfCard.AddCard(new Card("Тройка червей"));
-            _deckOfCard.AddCard(new Card("Пятерка червей"));
-            _deckOfCard.AddCard(new Card("Валет червей"));
-            _deckOfCard.AddCard(new Card("Туз червей"));
-            _deckOfCard.AddCard(new Card("Дама червей"));
-            _deckOfCard.AddCard(new Card("Двойка червей"));
-            _deckOfCard.AddCard(new Card("Джокер"));
-
+            DeckFactory deckFactory = new DeckFactory();
+            _deck = new Deck(deckFactory.GetNewDeck());
             _player = new Player();
         }
 
         public void DealCards(int numberOfCards)
         {
-            for (int i = 0; i < numberOfCards; i++) 
+            for (int i = 0; i < numberOfCards; i++)
             {
-                _player.ReceiveCard(_deckOfCard.DealCard());
+                _player.ReceiveCard(_deck.DealCard());
             }
         }
 
         public void Play()
-        {          
+        {
             Console.WriteLine("Введите сколько карт вам нужно");
 
             bool isNumber = false;
@@ -48,28 +42,41 @@ namespace Deck_of_cards
             {
                 if (isNumber = int.TryParse(Console.ReadLine(), out int numberOfCards))
                 {
-                    if (_deckOfCard.GetSize() < numberOfCards)
+                    if (_deck.Size < numberOfCards)
                     {
                         Console.WriteLine("В колоде не достаточно карт");
                     }
                     else
                     {
                         DealCards(numberOfCards);
-                        _deckOfCard.ShowCards();
+                        _deck.ShowCards();
                         _player.ShowCards();
-                    }                        
+                    }
                 }
                 else
                 {
                     Console.WriteLine("Вы ввели не число!");
                 }
-            }            
+            }
         }
     }
 
-    class DeckOfCard
+    class Deck
     {
         private Stack<Card> _cards = new Stack<Card>();
+
+        public Deck(List<Card> cards)
+        {
+            foreach (Card card in cards)
+            {
+                _cards.Push(card);
+            }
+        }
+
+        public int Size
+        {
+            get { return _cards.Count; }
+        }
 
         public void AddCard(Card card)
         {
@@ -87,25 +94,47 @@ namespace Deck_of_cards
 
             foreach (Card card in _cards)
             {
-                Console.WriteLine(card.Name);
+                Console.WriteLine($"{card.Name} - {card.Suit}");
             }
         }
+    }
 
-        public int GetSize()
+    class DeckFactory
+    {
+        private List<Card> _cards = new List<Card>();
+
+        public DeckFactory()
         {
-            return _cards.Count;
+            _cards.Add(new Card("Туз", "Червы"));
+            _cards.Add(new Card("Король", "Червы"));
+            _cards.Add(new Card("Дама", "Червы"));
+            _cards.Add(new Card("Валет", "Червы"));
+            _cards.Add(new Card("Десятка", "Червы"));
+
+            _cards.Add(new Card("Девятка", "Бубны"));
+            _cards.Add(new Card("Восьмёрка", "Бубны"));
+            _cards.Add(new Card("Семёрка", "Бубны"));
+            _cards.Add(new Card("Шестёрка", "Бубны"));
+            _cards.Add(new Card("Пятёрка", "Бубны"));
         }
 
+        public List<Card> GetNewDeck()
+        {
+            return _cards;
+        }
     }
 
     class Card
     {
-        public string Name { get; private set; }
-
-        public Card(string name)
+        public Card(string name, string suit)
         {
             Name = name;
+            Suit = suit;
         }
+
+        public string Name { get; private set; }
+        public string Suit { get; private set; }
+
     }
 
     class Player
@@ -121,9 +150,9 @@ namespace Deck_of_cards
         {
             Console.WriteLine("\nКарты на руках у игрока:");
 
-            foreach(Card card in _cards)
+            foreach (Card card in _cards)
             {
-                Console.WriteLine(card.Name);
+                Console.WriteLine($"{card.Name} - {card.Suit}");
             }
         }
     }
