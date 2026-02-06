@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Library
 {
@@ -20,12 +15,7 @@ namespace Library
     class Library
     {
         private List<Book> _books;
-
-        private string _searchParamAll = "all";
-        private string _searchParamName = "name";
-        private string _searchParamAuthor = "author";
-        private string _searchParamYear = "year";
-
+        private Utils _utils = new Utils();
 
         public Library()
         {
@@ -50,7 +40,6 @@ namespace Library
             Menu menu = new Menu();
             BookFactory bookFactory = new BookFactory();
             _books = new List<Book>(bookFactory.Create(books));
-            Utils utils = new Utils();
 
             bool isExit = false;
 
@@ -60,26 +49,34 @@ namespace Library
 
                 menu.Show();
 
-                int command = utils.ReadInt("\nВыберите пункт меню");
+                int command = _utils.ReadInt("\nВыберите пункт меню");
 
                 switch (command)
                 {
                     case Menu.AddCommand:
+                        AddBook();
                         break;
+
                     case Menu.DeleteCommand:
+                        DeleteBook();
                         break;
+
                     case Menu.SearchNameCommand:
-                        Show(Search(_searchParamName));
+                        ShowBooks(SearchByName());
                         break;
+
                     case Menu.SearchAuthorCommand:
-                        Show(Search(_searchParamAuthor));
+                        ShowBooks(SearchByAuthor());
                         break;
+
                     case Menu.SearchYearCommand:
-                        Show(Search(_searchParamYear));
+                        ShowBooks(SearchByYear());
                         break;
+
                     case Menu.ShowAllCommand:
-                        Show(Search(_searchParamAll));
+                        ShowBooks(_books);
                         break;
+
                     case Menu.ExitCommand:
                         isExit = true;
                         break;
@@ -92,17 +89,41 @@ namespace Library
             Console.ReadKey();
         }
 
-        public void Add()
+        public void AddBook()
         {
+            Console.WriteLine("Введите автора:");
+            string author = Console.ReadLine();
 
+            Console.WriteLine("Введите название книги:");
+            string name = Console.ReadLine();
+
+            int year = _utils.ReadInt("Введите год выпуска книги:");
+
+            _books.Add(new Book(name, author, year));
+
+            Console.WriteLine("Книга добавлена.");
         }
 
-        public void Delete()
+        public void DeleteBook()
         {
+            Console.Clear();
 
+            ShowBooks(_books);
+
+            int index = _utils.ReadInt("Введите номер книги которую хотите удалить:") - 1;
+
+            if (index > 0 && index <= _books.Count)
+            {
+                _books.RemoveAt(index);
+                Console.WriteLine("Книга удалена.");
+            }
+            else
+            {
+                Console.WriteLine("Вы ввели номер не существющей книги!");
+            }
         }
 
-        public void Show(List<Book> books)
+        public void ShowBooks(List<Book> books)
         {
             if (books.Count == 0)
             {
@@ -110,45 +131,58 @@ namespace Library
             }
             else
             {
-                foreach (Book book in books)
+                for (int i = 0;  i < books.Count; i++)
                 {
-                    Console.WriteLine($"{book.Author}, {book.Name}, {book.Year}");
+                    Console.WriteLine($"{i + 1}. {books[i].Author}, {books[i].Name}, {books[i].Year}");
                 }
             }
         }
 
-        public List<Book> Search(string param)
+        public List<Book> SearchByAuthor()
         {
-            if (param == "all")
-                return _books;
-
-            Utils utils = new Utils();
             List<Book> filteredBooks = new List<Book>();
 
-            int userInputNumber = 0;
-            string userInput = "";
+            Console.Write("Введите автора: ");
+            string userInput = Console.ReadLine();
 
-            if (param == _searchParamYear)
-            {
-                userInputNumber = utils.ReadInt("Введите год");
+            foreach (Book book in _books) 
+            { 
+                if (book.Author == userInput)
+                {
+                    filteredBooks.Add(book);
+                }
             }
-            else
-            {
-                Console.WriteLine("Что ищем?");
-                userInput = Console.ReadLine();
-            }                
+
+            return filteredBooks;
+        }
+
+        public List<Book> SearchByYear()
+        {
+            List<Book> filteredBooks = new List<Book>();
+
+            int userInput = _utils.ReadInt("Введите год");
 
             foreach (Book book in _books)
             {
-                if (param == _searchParamName && book.Name == userInput)
+                if (book.Year == userInput)
                 {
                     filteredBooks.Add(book);
                 }
-                else if (param == _searchParamAuthor && book.Author == userInput)
-                {
-                    filteredBooks.Add(book);
-                }
-                else if (param == _searchParamYear && book.Year == userInputNumber)
+            }
+
+            return filteredBooks;
+        }
+
+        public List<Book> SearchByName()
+        {
+            List<Book> filteredBooks = new List<Book>();
+
+            Console.Write("Введите название книги: ");
+            string userInput = Console.ReadLine();
+
+            foreach (Book book in _books)
+            {
+                if (book.Name == userInput)
                 {
                     filteredBooks.Add(book);
                 }
