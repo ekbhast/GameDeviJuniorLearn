@@ -198,8 +198,6 @@ namespace Train_dispatcher
                 car.ShowPassengers();
             }
         }
-
-        
     }
 
     class TrainFactory
