@@ -40,6 +40,7 @@
     <Project Path="fight boss/fight boss.csproj" Id="6afeadc5-e80f-42c0-b071-8e8335716b47" />
   </Folder>
   <Folder Name="/OOP home works/">
+    <Project Path="Colosseum/Colosseum.csproj" Id="87241609-dc9e-4a3f-8660-403c4b18eefd" />
     <Project Path="Deck of cards/Deck of cards.csproj" Id="9182c69b-2140-42c8-a7cb-ad5a0cbc98a9" />
     <Project Path="Library/Library.csproj" Id="6e457e68-2649-4a1e-b059-f9999c1b273b" />
     <Project Path="players data base/players data base.csproj" Id="b7ac2e43-d7ea-4c09-aab3-496d80424366" />
