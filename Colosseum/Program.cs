@@ -11,6 +11,7 @@ namespace Colosseum
             colosseum.Work();
         }
     }
+
     class Colosseum
     {
         private List<Gladiator> _gladiators = new List<Gladiator>
@@ -37,7 +38,6 @@ namespace Colosseum
             while (isExit == false)
             {
                 Console.Clear();
-
                 mainMenu.ShowMainMenu();
 
                 int command = Utils.ReadInt("Выберите пункт меню");
@@ -68,34 +68,41 @@ namespace Colosseum
         public void RunFight(GladiatorsMenu gladiatorMenu)
         {
             Console.Clear();
-
             ShowGladiatorStats();
 
+            IAttacker attacker;
+            IDamageable damageable;
+
             Console.WriteLine("Гладиаторы для выбора:");
-            gladiatorMenu.Show();
+            gladiatorMenu.Show(_gladiators);
 
             Console.WriteLine("Выберете первого гладиатора:");
-            _gladiator1 = SelectGladiator(_gladiators);
+            _gladiator1 = SelectGladiator();
 
             Console.WriteLine("Выберете второго гладиатора:");
-            _gladiator2 = SelectGladiator(_gladiators);
-
-            int damage;
+            _gladiator2 = SelectGladiator();
 
             while (_gladiator1.IsAlive == true && _gladiator2.IsAlive == true)
             {
                 Console.WriteLine(new string('=', 30));
 
-                damage = _gladiator2.Attack();
-                _gladiator1.TakeDamage(damage);
+                attacker = _gladiator1;
+                damageable = _gladiator2;
+                attacker.Attack(damageable);
 
-                damage = _gladiator1.Attack();
-                _gladiator2.TakeDamage(damage);
+                attacker = _gladiator2;
+                damageable = _gladiator1;
+                attacker.Attack(damageable);
 
                 Console.WriteLine($"Здоровье первого гладиатора {_gladiator1.Type} : {_gladiator1.Health}");
                 Console.WriteLine($"Здоровье второго гладиатора {_gladiator2.Type}: {_gladiator2.Health}");
-            }
 
+                DetermineWinner();
+            }
+        }
+
+        public void DetermineWinner()
+        {
             if (_gladiator1.IsAlive == false && _gladiator2.IsAlive == false)
             {
                 Console.WriteLine("Ничья");
@@ -110,40 +117,14 @@ namespace Colosseum
             }
         }
 
-        public Gladiator SelectGladiator(List<Gladiator> gladiators)
+        public Gladiator SelectGladiator()
         {
             Gladiator gladiator = null;
 
             while (gladiator == null)
             {
                 int command = Utils.ReadInt();
-
-                switch (command)
-                {
-                    case GladiatorsMenu.BarbarianCommand:
-                        gladiator = gladiators[GladiatorsMenu.BarbarianCommand - 1].Clone();
-                        break;
-
-                    case GladiatorsMenu.JuggernautCommand:
-                        gladiator = gladiators[GladiatorsMenu.JuggernautCommand - 1].Clone();
-                        break;
-
-                    case GladiatorsMenu.BerserkerCommand:
-                        gladiator = gladiators[GladiatorsMenu.BerserkerCommand - 1].Clone();
-                        break;
-
-                    case GladiatorsMenu.PyromancerCommand:
-                        gladiator = gladiators[GladiatorsMenu.PyromancerCommand - 1].Clone();
-                        break;
-
-                    case GladiatorsMenu.AssassinCommand:
-                        gladiator = gladiators[GladiatorsMenu.AssassinCommand - 1].Clone();
-                        break;
-
-                    default:
-                        Console.WriteLine("Такого гладиатора нет");
-                        break;
-                }
+                gladiator = _gladiators[command - 1].Clone();
             }
 
             return gladiator;
@@ -159,17 +140,37 @@ namespace Colosseum
         }
     }
 
-    abstract class Gladiator
+    interface IDamageable
     {
+        void TakeDamage(int damage);
+    }
+
+    interface IAttacker
+    {
+        void Attack(IDamageable target);
+    }
+
+    abstract class Gladiator : IDamageable, IAttacker
+    {
+        protected Gladiator(int health, int armor, int minDamage, int maxDamage, int minPercent, int maxPercent)
+        {
+            Health = health;
+            Armor = armor;
+            MinDamageValue = minDamage;
+            MaxDamageValue = maxDamage;
+            MinPercentValue = minPercent;
+            MaxPercentValue = maxPercent;
+        }
+
         public abstract string Type { get; }
         public abstract string SpecialAbilityName { get; }
         public abstract string SpecialAbilityInfo { get; }
-        public int Health { get; protected set; } = 100;
-        public int Armor { get; private set; } = 100;
-        public int MinDamageValue { get; private set; } = 1;
-        public int MaxDamageValue { get; private set; } = 10;
-        public int MinPercentValue { get; private set; } = 0;
-        public int MaxPercentValue { get; private set; } = 100;
+        public int Health { get; protected set; }
+        public int Armor { get; private set; }
+        public int MinDamageValue { get; private set; }
+        public int MaxDamageValue { get; private set; }
+        public int MinPercentValue { get; private set; }
+        public int MaxPercentValue { get; private set; }
 
         public bool IsAlive
         {
@@ -184,7 +185,18 @@ namespace Colosseum
 
         public virtual void TakeDamage(int damage)
         {
-            Health -= damage;
+            int damageTaken = damage - Armor;
+
+            if (damageTaken < 0)
+            {
+                damageTaken = 0;
+            }
+            else
+            {
+                damageTaken = damage - Armor;
+            }
+
+            Health -= damageTaken;
         }
 
         public virtual void ShowStats()
@@ -200,7 +212,7 @@ namespace Colosseum
             Console.WriteLine($"{Type} выбивает {damage} урона");
             Console.WriteLine("---");
         }
-        
+
         public void ShowAbilityUsed()
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -208,19 +220,24 @@ namespace Colosseum
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public abstract int Attack();
+        public abstract void Attack(IDamageable target);
         public abstract Gladiator Clone();
     }
 
     class Barbarian : Gladiator
     {
-        private int _chancePercent = 30;
+        private int _chancePercent;
+
+        public Barbarian() : base(100, 3, 0, 10, 0, 100)
+        {
+            _chancePercent = 30;
+        }
 
         public override string SpecialAbilityName { get; } = "Двойной урон";
         public override string SpecialAbilityInfo { get; } = "Спец умение -  шанс двойного урона";
         public override string Type { get; } = "Варвар";
 
-        public override int Attack()
+        public override void Attack(IDamageable target)
         {
             int damage = GetDamage();
             bool isCritical = Utils.GenerateRandomNumber(MinPercentValue, MaxPercentValue) < _chancePercent;
@@ -231,8 +248,8 @@ namespace Colosseum
                 damage += damage;
             }
 
+            target.TakeDamage(damage);
             ShowInfoDamage(damage);
-            return damage;
         }
 
         public override Gladiator Clone()
@@ -249,13 +266,18 @@ namespace Colosseum
 
     class Juggernaut : Gladiator
     {
-        private int _attackCounter = 0;
+        private int _attackCounter;
+
+        public Juggernaut() : base(100, 3, 0, 10, 0, 100)
+        {
+            _attackCounter = 0;
+        }
 
         public override string SpecialAbilityName { get; } = "Двойной урон";
         public override string SpecialAbilityInfo { get; } = "Спец умение - каждую третью свою атаку наносит дважды урон врагу";
         public override string Type { get; } = "Джагернаут";
 
-        public override int Attack()
+        public override void Attack(IDamageable target)
         {
             int damage = GetDamage();
             _attackCounter++;
@@ -266,8 +288,8 @@ namespace Colosseum
                 _attackCounter = 0;
             }
 
+            target.TakeDamage(damage);
             ShowInfoDamage(damage);
-            return damage;
         }
 
         public override void ShowStats()
@@ -284,28 +306,36 @@ namespace Colosseum
 
     class Berserker : Gladiator
     {
-        private int _fury = 0;
-        private int _maxStackFury = 4;
-        private int _healingValue = 10;
+        private int _fury;
+        private int _maxStackFury;
+        private int _healingValue;
+
+        public Berserker() : base(100, 3, 0, 10, 0, 100)
+        {
+            _fury = 0;
+            _maxStackFury = 4;
+            _healingValue = 10;
+        }
 
         public override string Type { get; } = "Берсерк";
         public override string SpecialAbilityName { get; } = "Лечение";
-        public override string SpecialAbilityInfo { get; } = "Спец умение - получая по себе урон накапливает ярость, после накопления максимума, использует лечение";
+        public override string SpecialAbilityInfo { get; } = "Спец умение - получая по себе урон накапливает ярость," +
+            " после накопления максимума, использует лечение";
 
-        public override int Attack() 
+        public override void Attack(IDamageable target)
         {
             int damage = GetDamage();
             _fury++;
 
-            if ( _fury == _maxStackFury)
+            if (_fury == _maxStackFury)
             {
                 ShowAbilityUsed();
                 Health += _healingValue;
                 _fury = 0;
             }
 
+            target.TakeDamage(damage);
             ShowInfoDamage(damage);
-            return damage;
         }
 
         public override void ShowStats()
@@ -322,9 +352,16 @@ namespace Colosseum
 
     class Pyromancer : Gladiator
     {
-        private int _mana = 100;
-        private int _manaCost = 25;
-        private int _fireBallDamage = 4;
+        private int _mana;
+        private int _manaCost;
+        private int _fireBallDamage;
+
+        public Pyromancer() : base(100, 3, 0, 10, 0, 100)
+        {
+            _mana = 100;
+            _manaCost = 25;
+            _fireBallDamage = 4;
+        }
 
         public override string Type { get; } = "Пиромансер";
         public override string SpecialAbilityName { get; } = "Фаербол";
@@ -332,20 +369,20 @@ namespace Colosseum
             " применения заклинания “Огненный шар”, он применяет данное заклинание. " +
             "Заклинание так же наносит урон, но урон больше от изначального";
 
-        public override int Attack()
+        public override void Attack(IDamageable target)
         {
             int damage = GetDamage();
 
             _mana -= _manaCost;
 
-            if ( _mana >= _manaCost)
+            if (_mana >= _manaCost)
             {
                 ShowAbilityUsed();
                 damage += _fireBallDamage;
             }
 
+            target.TakeDamage(damage);
             ShowInfoDamage(damage);
-            return damage;
         }
 
         public override void ShowStats()
@@ -362,38 +399,43 @@ namespace Colosseum
 
     class Assassin : Gladiator
     {
-        private bool _hasDodged = false;
-        private int _chancePercent = 30;
+        private bool _hasDodged;
+        private int _chancePercent;
+
+        public Assassin() : base(100, 3, 0, 10, 0, 100)
+        {
+            _hasDodged = false;
+            _chancePercent = 30;
+        }
 
         public override string Type { get; } = "Ассасин";
         public override string SpecialAbilityName { get; } = "Уклонение";
         public override string SpecialAbilityInfo { get; } = "Спец умение - шанс уклонится от удара";
 
-        public override int Attack()
+        public override void Attack(IDamageable target)
         {
             int damage = GetDamage();
 
             _hasDodged = Utils.GenerateRandomNumber(MinPercentValue, MaxPercentValue) < _chancePercent;
 
-            if (_hasDodged) 
+            if (_hasDodged)
             {
                 ShowAbilityUsed();
             }
 
+            target.TakeDamage(damage);
             ShowInfoDamage(damage);
-            return damage; 
         }
 
         public override void TakeDamage(int damage)
         {
-            if (_hasDodged) 
+            if (_hasDodged)
             {
                 base.TakeDamage(0);
             }
             else
             {
                 base.TakeDamage(damage);
-
             }
         }
 
@@ -409,7 +451,7 @@ namespace Colosseum
         }
     }
 
-class MainMenu
+    class MainMenu
     {
         public const int IntroMessageCommand = 1;
         public const int SeeFightCommand = 2;
@@ -425,22 +467,16 @@ class MainMenu
 
     class GladiatorsMenu
     {
-        public const int BarbarianCommand = 1;
-        public const int JuggernautCommand = 2;
-        public const int BerserkerCommand = 3;
-        public const int PyromancerCommand = 4;
-        public const int AssassinCommand = 5;
+        private List<Gladiator> _gladiators = new List<Gladiator>();
 
-        public void Show()
+        public void Show(List<Gladiator> _gladiators)
         {
-            Console.WriteLine($"{BarbarianCommand}. Варвар.");
-            Console.WriteLine($"{JuggernautCommand}. Джагернаут.");
-            Console.WriteLine($"{BerserkerCommand}. Берсерк");
-            Console.WriteLine($"{PyromancerCommand}. Пиромансер");
-            Console.WriteLine($"{AssassinCommand}. Ассасин");
+            for (int i = 0; i < _gladiators.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {_gladiators[i].Type}");
+            }
         }
     }
-
 
     class Utils
     {
@@ -453,7 +489,7 @@ class MainMenu
 
         public static int ReadInt(string prompt = "")
         {
-            Console.Write(prompt);
+            Console.WriteLine(prompt);
 
             bool isNumber = false;
             int number = 0;
