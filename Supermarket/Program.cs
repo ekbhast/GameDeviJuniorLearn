@@ -23,6 +23,8 @@ namespace Supermarket
         private int _balance;
         private Dictionary <string, int> _cart = new Dictionary<string, int>();
         private Dictionary <string, int> _bag = new Dictionary<string, int>();
+
+
     }
 
     internal class Program
