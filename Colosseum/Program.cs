@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Colosseum
 {
@@ -34,7 +32,7 @@ namespace Colosseum
         public int MaxPercent { get; private set; }
 
         public abstract string Type { get; }
-        public abstract string AbilityName { get; }
+        public abstract string AbillityName { get; }
         public abstract string AbillityInfo { get; }
 
         public bool IsAlive
@@ -67,7 +65,7 @@ namespace Colosseum
 
             Health -= damageTaken;
         }
-    
+
         public virtual void ShowStats()
         {
             Console.WriteLine($"Класс: {Type}");
@@ -78,162 +76,13 @@ namespace Colosseum
 
         public virtual void Attack(IDamageable target)
         {
-        }
+            int damage = GetDamage();
 
-        public void DefaultAttack(int damage, IDamageable target)
-        {
             Console.WriteLine($"{Type} нанес {damage} урона обычной атакой");
             target.TakeDamage(damage);
         }
 
         public abstract Gladiator Clone();
-    }
-
-    class DoubleAttack
-    {
-        private int _attackCount = 0;
-        private int _attacksToActivate = 3;
-
-        public string Name { get; } = "Двойная атака";
-
-        public bool TryUse(ref int damage, IDamageable target, IAttacker self)
-        {
-            _attackCount++;
-
-            if (_attackCount == _attacksToActivate)
-            {
-                Use(ref damage, target, self);
-
-                _attackCount = 0;
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void Use(ref int damage, IDamageable target, IAttacker self)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{self.Type} применил умение {Name}");
-            Console.ForegroundColor = ConsoleColor.White;
-
-            int extraDamage = self.Attack(target);
-        }
-    }
-
-    class FuryHealing
-    {
-        int furyForUseAbility = 20;
-        int healingValue = 10;
-
-        public string Name { get; } = "Яростное лечение";
-
-        public bool TryUse(ref int damage, IDamageable target, IAttacker self)
-        {
-            if (self is Berserker berserker)
-            {
-                berserker.CollectFury(damage);
-
-                if (berserker.Fury >= furyForUseAbility)
-                {
-                    Use(ref damage, target, self);
-                    berserker.ResetFury();
-
-                    return true;
-                } else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void Use(ref int damage, IDamageable target, IAttacker self)
-        {
-            self.TakeHealilng(healingValue);
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{self.Type} применил умение {Name} на {healingValue} лечения");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-    }
-
-    class FireBall
-    {
-        int manaCost = 20;
-
-        public string Name { get; } = "Огненный шар";
-
-        public bool TryUse(ref int damage, IDamageable target, IAttacker self)
-        {
-            if (self is IMagic magicUser && magicUser.CanSpendMana(manaCost))
-            {
-                Use(ref damage, target, self);
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void Use(ref int damage, IDamageable target, IAttacker self)
-        {
-            int extraDamage = 5;
-            int fireBallDamage;
-            int fireBallMinDamage = damage;
-            int fireBallMaxDamage = damage + extraDamage;
-
-            if (self is IMagic magicUser && magicUser.CanSpendMana(manaCost))
-            {
-                magicUser.SpendMana(manaCost);
-
-                fireBallDamage = Utils.GenerateRandomNumber(fireBallMinDamage, fireBallMaxDamage);
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{self.Type} применил умение {Name} на {fireBallDamage} урона");
-                Console.ForegroundColor = ConsoleColor.White;
-
-                target.TakeDamage(fireBallDamage);               
-            }
-        }
-    }
-
-    class Dodge
-    {
-        int _chancePercent = 30;
-
-        public string Name { get; } = "Уклонение";
-
-        public bool TryUse(ref int damage, IDamageable target, IAttacker self)
-        {
-            int minPercent = 0;
-            int maxPercent = 100;
-
-            if (Utils.GenerateRandomNumber(minPercent, maxPercent) <= _chancePercent)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{self.Type} применил умение {Name}");
-                Console.ForegroundColor = ConsoleColor.White;
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void Use(ref int damage, IDamageable target, IAttacker self)
-        {
-        }
     }
 
     class Barbarian : Gladiator
@@ -247,26 +96,25 @@ namespace Colosseum
 
         public override string Type { get; } = "Варвар";
 
-        public override string AbilityName { get; } = "Двойной урон";
+        public override string AbillityName { get; } = "Удвоенный урон";
         public override string AbillityInfo { get; } = "Спец умение -  шанс нанести удвоенный урон";
 
         public override void Attack(IDamageable target)
         {
-            int damage = GetDamage();
-
             if (Utils.GenerateRandomNumber(MinPercent, MaxPercent) <= _chancePercent)
             {
+                int damage = GetDamage();
                 damage = damage * _damageMultiplicator;
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{Type} применил умение \"{AbilityName}\" и удвоил урон до {damage}");
+                Console.WriteLine($"{Type} применил умение \"{AbillityName}\" и удвоил урон до {damage}");
                 Console.ForegroundColor = ConsoleColor.White;
 
                 target.TakeDamage(damage);
             }
             else
             {
-                DefaultAttack(damage, target);
+                base.Attack(target);
             }
         }
 
@@ -284,13 +132,39 @@ namespace Colosseum
 
     class Juggernaut : Gladiator
     {
-        public Juggernaut() : base(100, 3, 0, 10)
+        private int _attackCount = 0;
+        private int _attacksToActivate = 3;
+
+        public Juggernaut() : base(100, 3, 0, 10, 0, 100)
         {
         }
-
-        public override string AbilityName { get; } = "Двойной урон";
-        public override string AbillityInfo { get; } = "Спец умение - каждую третью свою атаку наносит дважды урон врагу";
         public override string Type { get; } = "Джагернаут";
+
+        public override string AbillityName { get; } = "Урон дважды";
+        public override string AbillityInfo { get; } = "Спец умение - каждую третью свою атаку наносит дважды урон врагу";
+
+        public override void Attack(IDamageable target)
+        {
+            _attackCount++;
+
+            if (_attackCount == _attacksToActivate)
+            {
+                int damage = GetDamage();
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{Type} применил умение \"{AbillityName}\" по {damage} урона.");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                target.TakeDamage(damage);
+                target.TakeDamage(damage);
+
+                _attackCount = 0;
+            }
+            else
+            {
+                base.Attack(target);
+            }
+        }
 
         public override void ShowStats()
         {
@@ -306,35 +180,53 @@ namespace Colosseum
 
     class Berserker : Gladiator
     {
-        public Berserker() : base(100, 3, 0, 10)
+        private int _furyForUseAbility = 20;
+        private int _healingValue = 10;
+        private int _maxHealth = 100;
+
+        public Berserker() : base(100, 3, 0, 10, 0, 100)
         {
         }
-
-        public int Fury { get; private set; } = 0;
         public override string Type { get; } = "Берсерк";
-        public override string AbilityName { get; } = "Лечение";
+        public int Fury { get; private set; } = 0;
+
+        public override string AbillityName { get; } = "Яростное лечение";
         public override string AbillityInfo { get; } = "Спец умение - получая по себе урон накапливает ярость," +
             " после накопления максимума, использует лечение";
+
+        public override void Attack(IDamageable target)
+        {
+            base.Attack(target);
+        }
+
+        public override void TakeDamage(int damage)
+        {
+            base.TakeDamage(damage);
+
+            Fury += damage;
+
+            if (Fury >= _furyForUseAbility)
+            {
+                Health = Health + _healingValue;
+
+                if (Health > _maxHealth) 
+                {
+                    Health = _maxHealth;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{Type} применил умение \"{AbillityName}\" на {_healingValue} лечения");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                Fury = 0;
+            }
+        }
 
         public override void ShowStats()
         {
             base.ShowStats();
             Console.WriteLine($"Ярость - {Fury}");
             Console.WriteLine(AbillityInfo);
-        }
-
-        public override void TakeDamage(int damage)
-        {
-            base.TakeDamage(damage);
-        }
-
-        public void CollectFury(int damage)
-        {
-            Fury += damage;
-        }
-        public void ResetFury()
-        {
-            Fury = 0;
         }
 
         public override Gladiator Clone()
@@ -345,40 +237,44 @@ namespace Colosseum
 
     class Pyromancer : Gladiator
     {
-        private int _mana = 100;
+        private int _manaCost = 20;
+        private int _fireBallDamage;
+        private int _fireBallMinDamage = 10;
+        private int _fireBallMaxDamage = 20;
 
-        public Pyromancer() : base(100, 3, 0, 10)
+        public Pyromancer() : base(100, 3, 0, 10, 0, 100)
         {
         }
 
-        public int Mana => _mana;
-
+        public int Mana { get; private set; } = 100;
         public override string Type { get; } = "Пиромансер";
-        public override string AbilityName { get; } = "Фаербол";
+        public override string AbillityName { get; } = "Огненный шар";
         public override string AbillityInfo { get; } = "Спец умение - есть мана и пока её достаточно для" +
             " применения заклинания “Огненный шар”, он применяет данное заклинание. " +
             "Заклинание так же наносит урон, но урон больше от изначального";
 
-        public bool CanSpendMana(int manaCost)
+        public override void Attack(IDamageable target)
         {
-            if (Mana >= manaCost)
-            {
-                return true;
-            }
-            return false;
-        }
+            base.Attack(target);
 
-        public void SpendMana(int manaCost)
-        {
-            _mana -= manaCost;
+            if (Mana > _manaCost)
+            {
+                _fireBallDamage = Utils.GenerateRandomNumber(_fireBallMinDamage, _fireBallMaxDamage);
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{Type} применил умение \"{AbillityName}\" на {_fireBallDamage} урона");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                Mana -= _manaCost;
+                target.TakeDamage(_fireBallDamage);
+            }
         }
 
         public override void ShowStats()
         {
             base.ShowStats();
-            Console.WriteLine($"Мана: {_mana}");
+            Console.WriteLine($"Мана: {Mana}");
             Console.WriteLine(AbillityInfo);
-            
         }
 
         public override Gladiator Clone()
@@ -389,22 +285,35 @@ namespace Colosseum
 
     class Assassin : Gladiator
     {
-        public Assassin() : base(100, 3, 0, 10)
+        private int _chancePercent = 30;
+
+        public Assassin() : base(100, 3, 0, 10, 0, 100)
         {
         }
 
         public override string Type { get; } = "Ассасин";
-        public override string AbilityName { get; } = "Уклонение";
+
+        public override string AbillityName { get; } = "Уклонение";
         public override string AbillityInfo { get; } = "Спец умение - шанс уклонится от удара";
+
+        public override void TakeDamage(int damage)
+        {
+            if (Utils.GenerateRandomNumber(MinPercent, MaxPercent) <= _chancePercent)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{Type} применил умение \"{AbillityName}\" и избежал урона");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                base.TakeDamage(damage);
+            }
+        }
 
         public override void ShowStats()
         {
             base.ShowStats();
             Console.WriteLine(AbillityInfo);
-        }
-
-        public override void TakeDamage(int damage)
-        {
         }
 
         public override Gladiator Clone()
