@@ -1,8 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Supermarket
 {
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Supermarket supermarket = new Supermarket();
+            supermarket.Work();
+        }
+    }
+
     class Supermarket
     {
         private List<Product> _products = new List<Product>
@@ -43,10 +53,10 @@ namespace Supermarket
         private Queue<Buyer> _buyers = new Queue<Buyer>();
         private int _balance = 0;
 
-        private const int ServeAll = 1;
+        private const int ServeAllBuyers = 1;
         private const int GetNewQueueCommand = 2;
         private const int ShowQueueCommand = 3;
-        private const int Exit = 4;
+        private const int ExitProgram = 4;
 
         public void Work()
         {
@@ -55,10 +65,10 @@ namespace Supermarket
             while (isExit == false)
             {
                 Console.Clear();
-                Console.WriteLine($"{ServeAll}. Обслужить очередь");
+                Console.WriteLine($"{ServeAllBuyers}. Обслужить очередь");
                 Console.WriteLine($"{GetNewQueueCommand}. Получить новых покупателей(очередь)");
                 Console.WriteLine($"{ShowQueueCommand}. Показать очередь");
-                Console.WriteLine($"{Exit}. Выход");
+                Console.WriteLine($"{ExitProgram}. Выход");
 
                 Console.WriteLine($"Баланс магазина {_balance}");
 
@@ -66,19 +76,19 @@ namespace Supermarket
 
                 switch (command)
                 {
-                    case ServeAll:
+                    case ServeAllBuyers:
                         ServeQueue();
                         break;
 
                     case GetNewQueueCommand:
-                        GetNewQueue();
+                        CreateNewQueue();
                         break;
 
                     case ShowQueueCommand:
                         ShowQueue();
                         break;
 
-                    case Exit:
+                    case ExitProgram:
                         isExit = true;
                         break;
 
@@ -94,7 +104,7 @@ namespace Supermarket
             Console.ReadKey();
         }
 
-        private void GetNewQueue()
+        private void CreateNewQueue()
         {
             BuyerFactory buyerFactory = new BuyerFactory();
 
@@ -105,7 +115,7 @@ namespace Supermarket
 
             for (int i = 0; i < buyersCount; i++)
             {
-                _buyers.Enqueue(buyerFactory.Create(_products));
+                _buyers.Enqueue(buyerFactory.Create(_products.ToList()));
             }
 
             Console.WriteLine("Очередь добавлена");
@@ -134,7 +144,7 @@ namespace Supermarket
             }
             else
             {
-                for (int i = 0; i < _buyers.Count; i++)
+                while (_buyers.Count > 0)
                 {
                     Console.WriteLine(new string('=', 45));
 
@@ -158,7 +168,7 @@ namespace Supermarket
 
                         if (buyer.Balance < cartCost)
                         {
-                            buyer.DeleteProductInCart();
+                            buyer.DeleteRandomProductInCart();
                         }
                         else
                         {
@@ -197,37 +207,27 @@ namespace Supermarket
 
         public void ShowInfo()
         {
-
             Console.WriteLine($"Баланс:{Balance}\n");
             Console.WriteLine("Корзина");
-            ShowCart();
+            ShowProducts(_cart);
             Console.WriteLine();
             Console.WriteLine("Сумка");
-            ShowBag();
-
+            ShowProducts(_bag);
         }
 
-        public void ShowCart()
+        public void ShowProducts(List<Product> products)
         {
-            foreach (Product product in _cart)
+            foreach (Product product in products)
             {
                 product.ShowInfo();
             }
         }
 
-        public void ShowBag()
-        {
-            foreach (Product product in _bag)
-            {
-                product.ShowInfo();
-            }
-        }
-
-        public int GetCartCost()
+        public int GetCostProducts(List<Product> products)
         {
             int cartCost = 0;
 
-            foreach (Product product in _cart)
+            foreach (Product product in products)
             {
                 cartCost += product.Price;
             }
@@ -235,19 +235,11 @@ namespace Supermarket
             return cartCost;
         }
 
-        public int GetBagCost()
-        {
-            int bagCost = 0;
+        public int GetCartCost() => GetCostProducts(_cart);
 
-            foreach (Product product in _bag)
-            {
-                bagCost += product.Price;
-            }
+        public int GetBagCost() => GetCostProducts(_bag);
 
-            return bagCost;
-        }
-
-        public void DeleteProductInCart()
+        public void DeleteRandomProductInCart()
         {
             int minRemoveIndex = 0;
             int maxRemoveIndex = _cart.Count;
@@ -267,9 +259,9 @@ namespace Supermarket
             for (int i = 0; i < _cart.Count; i++)
             {
                 _bag.Add(_cart[i]);
-                Balance -= _cart[i].Price;
             }
 
+            Balance -= GetCartCost();
             _cart.Clear();
         }
     }
@@ -345,20 +337,6 @@ namespace Supermarket
             }
 
             return number;
-        }
-
-        public static void ChangeTextColor(ConsoleColor color)
-        {
-            Console.ForegroundColor = color;
-        }
-    }
-
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            Supermarket supermarket = new Supermarket();
-            supermarket.Work();
         }
     }
 }
