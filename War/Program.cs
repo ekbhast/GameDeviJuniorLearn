@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace War
 {
@@ -11,30 +7,44 @@ namespace War
     {
         static void Main(string[] args)
         {
-            Battlefield battlefield = new Battlefield();
-            battlefield.Fight();
+            PlatoonFactory platoonFactory = new PlatoonFactory();
+        
+            Battlefield battlefield = new Battlefield(platoonFactory);
+            battlefield.StartBattle();
         }
+    }
+
+    interface IDamageable
+    {
+        void TakeDamage(int damage);
+    }
+
+    interface ISquad
+    {
+        int GetRandomIndexSoldier();
+        Soldier GetSoldier(int index);
+        int Count { get; }
     }
 
     class Battlefield
     {
         private const int RunFight = 1;
         private const int ExitGame = 2;
-        
-        //public Battlefield(List<Soldier> platoon1, List<Soldier> platoon2)
-        //{
-        //    Platoon1 = platoon1;
-        //    Platoon2 = platoon2;
-        //}
 
-        public List<Soldier> Platoon1 = new List<Soldier>();
-        public List<Soldier> Platoon2 = new List<Soldier>();
+        private Platoon _platoon1;
+        private Platoon _platoon2;
+        private PlatoonFactory _platoonFactory;
 
-        public void Fight()
+        public Battlefield(PlatoonFactory platoonFactory)
+        {
+            _platoonFactory = platoonFactory;
+        }
+
+        public void StartBattle()
         {
             bool isEndGame = false;
 
-            while(isEndGame == false)
+            while (isEndGame == false)
             {
                 Console.Clear();
 
@@ -46,7 +56,7 @@ namespace War
                 switch (command)
                 {
                     case RunFight:
-                        Console.WriteLine("Битва началась");
+                        StartFight();
                         break;
 
                     case ExitGame:
@@ -64,65 +74,311 @@ namespace War
             Console.WriteLine("До встречи");
             Console.ReadKey();
         }
+
+        public void StartFight()
+        {
+            bool hasWinner = false;
+
+            _platoon1 = new Platoon(_platoonFactory.Create());
+            _platoon2 = new Platoon(_platoonFactory.Create());
+
+            Console.WriteLine($"Первый взвод перед боем:");
+            _platoon1.ShowInfo();
+            Console.WriteLine();
+            Console.WriteLine($"Второй взвод перед боем:");
+            _platoon2.ShowInfo();
+
+            while (hasWinner == false)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Атака первого взвода!");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                _platoon1.Attack(_platoon2);
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Атака второго взвода!");
+                Console.ForegroundColor = ConsoleColor.White;
+
+                _platoon2.Attack(_platoon1);
+
+                _platoon1.RemoveDeadSoldiers();
+                _platoon2.RemoveDeadSoldiers();
+
+                Console.WriteLine($"Взвод 1:");
+                _platoon1.ShowInfo();
+
+                Console.WriteLine($"Взвод 2:");
+                _platoon2.ShowInfo();
+
+                if (_platoon1.HasAliveSoldiers() && _platoon2.HasAliveSoldiers())
+                {
+                    Console.WriteLine(new string('=', 45));
+                }
+                else
+                {
+                    ShowWinner();
+                    hasWinner = true;
+                }
+            }
+        }
+
+        public void ShowWinner()
+        {
+            if (_platoon1.HasAliveSoldiers() == false && _platoon2.HasAliveSoldiers() == false)
+            {
+                Console.WriteLine("Ничья");
+            }
+            else if (_platoon1.HasAliveSoldiers() == false)
+            {
+                Console.WriteLine($"Победил  взвод под номером 2");
+            }
+            else if (_platoon2.HasAliveSoldiers() == false)
+            {
+                Console.WriteLine($"Победил  взвод под номером 1");
+            }
+        }
     }
 
-    public abstract class Soldier
+    abstract class Soldier : IDamageable
     {
-        public Soldier(int health, int damage, int armor)
+        public Soldier(int health, int damage, int minDamage, int armor, string type)
         {
             Health = health;
-            Damage = damage;
+            MaxDamage = damage;
+            MinDamage = minDamage;
             Armor = armor;
+            Type = type;
         }
 
         public int Health { get; private set; }
-        public int Damage { get; private set; }
         public int Armor { get; private set; }
+        public string Type { get; private set; }
+        public bool IsAlive => Health > 0;
+        public int MaxDamage { get; private set; } = 10;
+        public int MinDamage { get; private set; } = 0;
 
-        public abstract void Attack();
-    }
+        public abstract void Attack(ISquad platoon);
 
-    public class Private : Soldier
-    {
-        public Private() : base(100, 10 ,5)
+        public abstract Soldier Clone();
+
+        public int GetDamage()
         {
+            int damage = Utils.GenerateRandomNumber(MaxDamage, MinDamage);
+            return damage;
         }
 
-        public override void Attack()
+        public virtual void TakeDamage(int damage)
         {
-        }
-    }
+            int damageTaken = damage - Armor;
 
-    public class Sniper : Soldier
-    {
-        public Sniper() : base(100, 10, 5)
-        {
-        }
+            if (damageTaken < 0)
+            {
+                damageTaken = 0;
+            }
 
-        public override void Attack()
-        {
-        }
-    }
+            Health -= damageTaken;
 
-    public class Gunner : Soldier
-    {
-        public Gunner() : base(100, 10, 5)
-        {
-        }
-
-        public override void Attack()
-        {
+            if (Health < 0)
+            {
+                Health = 0;
+            }
         }
     }
 
-    public class Artillery : Soldier
+    class Platoon :ISquad
     {
-        public Artillery() : base(100, 10, 5)
+        private List<Soldier> _soldiers;
+
+        public Platoon(List<Soldier> soldiers)
+        {
+            _soldiers = soldiers;
+        }
+
+        public int Count => _soldiers.Count;
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"В взводе живых еще: {_soldiers.Count} ");
+            foreach (Soldier soldier in _soldiers)
+            {
+                Console.WriteLine($"Боец {soldier.Type} - Здоровье: {soldier.Health}");
+            }
+        }
+
+        public void RemoveDeadSoldiers()
+        {
+            _soldiers.RemoveAll(soldier => !soldier.IsAlive);
+        }
+
+        public bool HasAliveSoldiers()
+        {
+            return _soldiers.Count > 0;
+        }
+
+        public void Attack(ISquad enemy)
+        {
+            foreach (Soldier soldier in _soldiers)
+            {
+                soldier.Attack(enemy);
+            }
+        }
+
+        public int GetRandomIndexSoldier()
+        {
+            int minIndex = 0;
+            int index = Utils.GenerateRandomNumber(minIndex, _soldiers.Count);
+            return index;
+        }
+
+        public Soldier GetSoldier(int index)
+        {
+            return _soldiers[index];
+        }
+
+        public List<Soldier> GetSoldiers()
+        {
+            return _soldiers;
+        }
+    }
+
+    class PlatoonFactory
+    {
+        private int _platoonCount = 10;
+        private int _minIndex = 0;
+
+        private List<Soldier> _soldiers = new List<Soldier>
+        {
+            new Private(),
+            new Sniper(),
+            new Gunner(),
+            new Grenadier()
+        };
+
+        public List<Soldier> Create()
+        {
+            List<Soldier> soldiers = new List<Soldier>();
+
+            for (int i = 0; i < _platoonCount; i++)
+            {
+                soldiers.Add(this._soldiers[Utils.GenerateRandomNumber(_minIndex, this._soldiers.Count)].Clone());
+            }
+
+            return soldiers;
+        }
+    }
+
+    class Private : Soldier
+    {
+        public Private() : base(100, 0, 10, 5, "Рядовой")
         {
         }
 
-        public override void Attack()
+        public override void Attack(ISquad enemy)
         {
+            int damage = GetDamage();
+
+            int randomIndex = enemy.GetRandomIndexSoldier();
+            IDamageable target = enemy.GetSoldier(randomIndex);
+
+            target.TakeDamage(damage);
+        }
+
+        public override Soldier Clone()
+        {
+            return new Private();
+        }
+    }
+
+    class Sniper : Soldier
+    {
+        private int _damageMultiplicator = 2;
+
+        public Sniper() : base(100, 0, 10, 5, "Снайпер")
+        {
+        }
+
+        public override void Attack(ISquad enemy)
+        {
+            int damage = GetDamage() * _damageMultiplicator;
+
+            int randomIndex = enemy.GetRandomIndexSoldier();
+            IDamageable target = enemy.GetSoldier(randomIndex);
+
+            target.TakeDamage(damage);
+        }
+
+        public override Soldier Clone()
+        {
+            return new Sniper();
+        }
+    }
+
+    class Gunner : Soldier
+    {
+        private int _targetCount = 3;
+
+        public Gunner() : base(100, 0, 10, 5, "Пулеметчик")
+        {
+        }
+
+        public override void Attack(ISquad enemy)
+        {
+            int attacks = _targetCount;
+            if (attacks > enemy.Count)
+            {
+                attacks = enemy.Count;
+            }
+
+            List<int> attackedTargetsIndexes = new List<int>();
+
+            for (int i = 0; i < attacks; i++)
+            {
+                int damage = GetDamage();
+
+                int randomIndex = enemy.GetRandomIndexSoldier();
+
+                while (attackedTargetsIndexes.Contains(randomIndex))
+                {
+                    randomIndex = enemy.GetRandomIndexSoldier();
+                }
+
+                IDamageable target = enemy.GetSoldier(randomIndex);
+
+                target.TakeDamage(damage);
+                attackedTargetsIndexes.Add(randomIndex);
+            }
+        }
+
+        public override Soldier Clone()
+        {
+            return new Gunner();
+        }
+    }
+
+    class Grenadier : Soldier
+    {
+        private int _targetCount = 3;
+
+        public Grenadier() : base(100, 0, 10, 5, "Гренадер")
+        {
+        }
+
+        public override void Attack(ISquad enemy)
+        {
+            for (int i = 0; i < _targetCount; i++)
+            {
+                int damage = GetDamage();
+                int randomIndex = enemy.GetRandomIndexSoldier();
+                IDamageable target = enemy.GetSoldier(randomIndex);
+
+                target.TakeDamage(damage);
+            }
+        }
+
+        public override Soldier Clone()
+        {
+            return new Grenadier();
         }
     }
 
