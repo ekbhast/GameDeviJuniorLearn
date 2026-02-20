@@ -22,7 +22,7 @@ namespace War
     interface ISquad
     {
         int GetRandomIndexSoldier();
-        Soldier GetSoldier(int index);
+        IDamageable GetSoldier(int index);
         int Count { get; }
     }
 
@@ -77,18 +77,18 @@ namespace War
 
         public void StartFight()
         {
-            bool hasWinner = false;
-
-            _platoon1 = new Platoon(_platoonFactory.Create());
-            _platoon2 = new Platoon(_platoonFactory.Create());
+            _platoon1 = _platoonFactory.Create();
+            _platoon2 = _platoonFactory.Create();
 
             Console.WriteLine($"Первый взвод перед боем:");
             _platoon1.ShowInfo();
+
             Console.WriteLine();
+
             Console.WriteLine($"Второй взвод перед боем:");
             _platoon2.ShowInfo();
 
-            while (hasWinner == false)
+            while (_platoon1.IsAlive && _platoon2.IsAlive)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"Атака первого взвода!");
@@ -110,30 +110,22 @@ namespace War
 
                 Console.WriteLine($"Взвод 2:");
                 _platoon2.ShowInfo();
-
-                if (_platoon1.HasAliveSoldiers() && _platoon2.HasAliveSoldiers())
-                {
-                    Console.WriteLine(new string('=', 45));
-                }
-                else
-                {
-                    ShowWinner();
-                    hasWinner = true;
-                }
             }
+
+            ShowWinner();
         }
 
         public void ShowWinner()
         {
-            if (_platoon1.HasAliveSoldiers() == false && _platoon2.HasAliveSoldiers() == false)
+            if (_platoon1.IsAlive == false && _platoon2.IsAlive == false)
             {
                 Console.WriteLine("Ничья");
             }
-            else if (_platoon1.HasAliveSoldiers() == false)
+            else if (_platoon1.IsAlive == false)
             {
                 Console.WriteLine($"Победил  взвод под номером 2");
             }
-            else if (_platoon2.HasAliveSoldiers() == false)
+            else if (_platoon2.IsAlive == false)
             {
                 Console.WriteLine($"Победил  взвод под номером 1");
             }
@@ -208,19 +200,16 @@ namespace War
 
         public void RemoveDeadSoldiers()
         {
-            _soldiers.RemoveAll(soldier => !soldier.IsAlive);
+            _soldiers.RemoveAll(soldier => soldier.IsAlive == false);
         }
 
-        public bool HasAliveSoldiers()
-        {
-            return _soldiers.Count > 0;
-        }
-
-        public void Attack(ISquad enemy)
+        public bool IsAlive => _soldiers.Count > 0;
+        
+        public void Attack(ISquad enemys)
         {
             foreach (Soldier soldier in _soldiers)
             {
-                soldier.Attack(enemy);
+                soldier.Attack(enemys);
             }
         }
 
@@ -231,14 +220,9 @@ namespace War
             return index;
         }
 
-        public Soldier GetSoldier(int index)
+        public IDamageable GetSoldier(int index)
         {
             return _soldiers[index];
-        }
-
-        public List<Soldier> GetSoldiers()
-        {
-            return _soldiers;
         }
     }
 
@@ -255,16 +239,18 @@ namespace War
             new Grenadier()
         };
 
-        public List<Soldier> Create()
+        public Platoon Create()
         {
             List<Soldier> soldiers = new List<Soldier>();
 
             for (int i = 0; i < _platoonCount; i++)
             {
-                soldiers.Add(this._soldiers[Utils.GenerateRandomNumber(_minIndex, this._soldiers.Count)].Clone());
+                soldiers.Add(_soldiers[Utils.GenerateRandomNumber(_minIndex, _soldiers.Count)].Clone());
             }
 
-            return soldiers;
+            Platoon platoon = new Platoon(soldiers);
+
+            return platoon;
         }
     }
 
@@ -274,12 +260,12 @@ namespace War
         {
         }
 
-        public override void Attack(ISquad enemy)
+        public override void Attack(ISquad enemys)
         {
             int damage = GetDamage();
 
-            int randomIndex = enemy.GetRandomIndexSoldier();
-            IDamageable target = enemy.GetSoldier(randomIndex);
+            int randomIndex = enemys.GetRandomIndexSoldier();
+            IDamageable target = enemys.GetSoldier(randomIndex);
 
             target.TakeDamage(damage);
         }
@@ -298,12 +284,12 @@ namespace War
         {
         }
 
-        public override void Attack(ISquad enemy)
+        public override void Attack(ISquad enemys)
         {
             int damage = GetDamage() * _damageMultiplicator;
 
-            int randomIndex = enemy.GetRandomIndexSoldier();
-            IDamageable target = enemy.GetSoldier(randomIndex);
+            int randomIndex = enemys.GetRandomIndexSoldier();
+            IDamageable target = enemys.GetSoldier(randomIndex);
 
             target.TakeDamage(damage);
         }
@@ -322,12 +308,12 @@ namespace War
         {
         }
 
-        public override void Attack(ISquad enemy)
+        public override void Attack(ISquad enemys)
         {
             int attacks = _targetCount;
-            if (attacks > enemy.Count)
+            if (attacks > enemys.Count)
             {
-                attacks = enemy.Count;
+                attacks = enemys.Count;
             }
 
             List<int> attackedTargetsIndexes = new List<int>();
@@ -336,14 +322,14 @@ namespace War
             {
                 int damage = GetDamage();
 
-                int randomIndex = enemy.GetRandomIndexSoldier();
+                int randomIndex = enemys.GetRandomIndexSoldier();
 
                 while (attackedTargetsIndexes.Contains(randomIndex))
                 {
-                    randomIndex = enemy.GetRandomIndexSoldier();
+                    randomIndex = enemys.GetRandomIndexSoldier();
                 }
 
-                IDamageable target = enemy.GetSoldier(randomIndex);
+                IDamageable target = enemys.GetSoldier(randomIndex);
 
                 target.TakeDamage(damage);
                 attackedTargetsIndexes.Add(randomIndex);
@@ -364,13 +350,13 @@ namespace War
         {
         }
 
-        public override void Attack(ISquad enemy)
+        public override void Attack(ISquad enemys)
         {
             for (int i = 0; i < _targetCount; i++)
             {
                 int damage = GetDamage();
-                int randomIndex = enemy.GetRandomIndexSoldier();
-                IDamageable target = enemy.GetSoldier(randomIndex);
+                int randomIndex = enemys.GetRandomIndexSoldier();
+                IDamageable target = enemys.GetSoldier(randomIndex);
 
                 target.TakeDamage(damage);
             }
