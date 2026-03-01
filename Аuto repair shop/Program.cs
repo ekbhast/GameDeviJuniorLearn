@@ -142,9 +142,21 @@ namespace Аuto_repair_shop
             _balance -= money;
         }
 
-        public Part DecreaseStorage(Part part)
+        public Part TryDecreaseStorage(Part part)
         {
-            return null;
+            Part newPart = null;
+
+            if (_partsStorage[part.Name] == 0)
+            {
+                return null;
+            }
+            else
+            {
+                _partsStorage[part.Name]--;
+                newPart = part.Clone();
+
+                return newPart;
+            }           
         }
 
         public void ShowQueue()
@@ -233,6 +245,10 @@ namespace Аuto_repair_shop
                         startRepair = true;
                         Part part = repairCar.GetPart(command - 1);
                         Part newPart = DecreaseStorage(part);
+                        if (newPart == null)
+                        {
+                            
+                        }
 
                         if (part.IsBroken == false)
                         {
