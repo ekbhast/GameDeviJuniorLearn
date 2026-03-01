@@ -44,7 +44,8 @@ namespace Аuto_repair_shop
     {
         private int _balance = 0;
         private Queue<Car> _cars = new Queue<Car>();
-        private Dictionary<Part, int> _partsStorage = new Dictionary<Part, int>();
+        private Dictionary<string, int> _partsStorage = new Dictionary<string, int>();
+
         private const int Fine = 1000;
         private const int FineForPart = 100;
 
@@ -86,7 +87,7 @@ namespace Аuto_repair_shop
 
             foreach (Part part in parts) 
             {
-                _partsStorage.Add(part.Clone(), Utils.GenerateRandomNumber(5, 10));
+                _partsStorage.Add(part.Name, Utils.GenerateRandomNumber(5, 10));
             }
 
             CarFactory carFactory = new CarFactory();
@@ -141,6 +142,11 @@ namespace Аuto_repair_shop
             _balance -= money;
         }
 
+        public Part DecreaseStorage(Part part)
+        {
+            return null;
+        }
+
         public void ShowQueue()
         {
             Console.WriteLine("\nМашины в очереди:");
@@ -162,9 +168,9 @@ namespace Аuto_repair_shop
         {
             Console.WriteLine("\nСклад:");
 
-            foreach (Part key in _partsStorage.Keys)
+            foreach (string key in _partsStorage.Keys)
             {
-                Console.WriteLine($"{key.Name}: {_partsStorage[key]}шт.");
+                Console.WriteLine($"{key}: {_partsStorage[key]}шт.");
             }
         }
 
@@ -195,10 +201,10 @@ namespace Аuto_repair_shop
                     ShowBalance();
                     Console.WriteLine($"{exitCommand}. Завершить ремонт.\n");
 
-                    repairCar.Show();
                     Console.WriteLine($"Сломанных деталей {brokenPartsCount}");
+                    repairCar.Show();
 
-                    int command = Utils.ReadInt("Выбирете деталь которую хотите отремонтировать или завершите ремонт:");
+                    int command = Utils.ReadInt("\nВыбирете деталь которую хотите отремонтировать или завершите ремонт:");
 
                     if (command == 0)
                     {
@@ -215,27 +221,29 @@ namespace Аuto_repair_shop
                         else
                         {
                             int answer = Utils.ReadInt($"Вы не завершили ремонт, вы заплатите штраф в рзамере {FineForPart} за каждую деталь, вы уверены? \n 1 - да \n 2 - нет");
-                            //To Do сделать вычитание штрафа за каждую деталь
                             if (answer == 1)
                             {
-
+                                DecreaseBalance(FineForPart * brokenPartsCount);
+                                isEnd = true;
                             }
                         }
                     }
                     else
                     {
                         startRepair = true;
+                        Part part = repairCar.GetPart(command - 1);
+                        Part newPart = DecreaseStorage(part);
 
-                        if (repairCar.GetPart(command - 1).IsBroken == false)
+                        if (part.IsBroken == false)
                         {
                             Console.WriteLine("Вы поменяли ценлую деть, оплаты не будет.");
                             Console.ReadKey();
                         }
                         else
                         {
-                            IncreaseBalance(repairCar.GetPart(command - 1).Price);
-                            IncreaseBalance(repairCar.GetPart(command - 1).RepairPraice);
-                            repairCar.RepairPart(command - 1);
+                            IncreaseBalance(part.Price);
+                            IncreaseBalance(part.RepairPraice);
+                            repairCar.ReplacePart(command - 1, part.Clone());
                         }
                     }
                 }
@@ -269,9 +277,10 @@ namespace Аuto_repair_shop
             }
         }
 
-        public void RepairPart(int index)
+        public void ReplacePart(int index, Part part)
         {
-            _parts[index].Repair();
+            _parts.RemoveAt(index);
+            _parts.Add(part);
         }
 
         public int GetBrokenPartsCount()
@@ -379,6 +388,7 @@ namespace Аuto_repair_shop
 
         public static bool GetRandomBoolean()
         {
+            //to do сделать массив булевых значений и из него выыбирать рандомно по индексу.
             return s_random.Next(2) > 0;
         }
 
