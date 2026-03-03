@@ -43,15 +43,8 @@ namespace Аuto_repair_shop
 
     class AutoRepair
     {
-        private int _balance = 0;
-        private Queue<Car> _cars = new Queue<Car>();
-        private Storage _storage;
-
         private const int Fine = 1000;
         private const int FineForPart = 100;
-
-        private List<string> _carModels;
-        private List<Part> _parts;
 
         private const int AnswerYes = 1;
         private const int AnswerNo = 2;
@@ -59,6 +52,13 @@ namespace Аuto_repair_shop
         private const int ExitCommand = 0;
         private const int AddCommand = 1;
         private const int RepairCommand = 2;
+
+        private int _balance = 0;
+        private Queue<Car> _cars = new Queue<Car>();
+        private Storage _storage;
+
+        private List<string> _carModels;
+        private List<Part> _parts;
 
         public AutoRepair(List<string> carsModels, List<Part> parts)
         {
@@ -69,8 +69,6 @@ namespace Аuto_repair_shop
 
         public void Work()
         {
-
-
             CarFactory carFactory = new CarFactory();
             bool isExit = false;
 
@@ -86,6 +84,14 @@ namespace Аuto_repair_shop
                 _storage.Show();
                 ShowQueue();
 
+                if (_balance < 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Ваш баланс ушел в минус. Игра окончена");
+                    isExit = true;
+                    continue;
+                }
+
                 int command = Utils.ReadInt("\nВыберите команду");
 
                 switch (command)
@@ -99,7 +105,7 @@ namespace Аuto_repair_shop
                         break;
 
                     case RepairCommand:
-                        RepairNextCar();
+                        TryRepairNextCar();
                         break;
 
                     default:
@@ -140,6 +146,19 @@ namespace Аuto_repair_shop
             }
         }
 
+        public void TryRepairNextCar()
+        {
+            if (_cars.Count == 0) 
+            {
+                Console.Clear();
+                Console.WriteLine("В очереди нет машин.");
+            }
+            else
+            {
+                RepairNextCar();
+            }
+        }
+
         private void ShowQueue()
         {
             Console.WriteLine("\nМашины в очереди:");
@@ -171,7 +190,7 @@ namespace Аuto_repair_shop
 
             while (isRepairFinished == false)
             {
-                if (repairCar.GetBrokenPartsCount() == 0)
+                if (repairCar.GetBrokenPartsCount() == 0 || _balance < 0)
                 {
                     Console.WriteLine("Ремонт завершен");
                     isRepairFinished = true;
@@ -335,7 +354,7 @@ class Car
 
         foreach (Part part in _parts)
         {
-            if (part.IsBroken == true)
+            if (part.IsBroken)
             {
                 partsCout++;
             }
@@ -458,8 +477,3 @@ class Utils
         return number;
     }
 }
-
-//todo
-// - При отрицательном балансе программа заканчивается.
-// - Сделать проверку на отсутсвие машин в очереди.
-// - еще усилить докомпозицию
