@@ -16,6 +16,9 @@
   <Folder Name="/lectures/">
     <Project Path="lectures/lectures.csproj" Id="e9187fa6-b325-49b7-90a0-9cf2358769ae" />
   </Folder>
+  <Folder Name="/lectures/Linq/">
+    <Project Path="1/1.csproj" Id="d0f5b3ee-a8a8-447c-8ad9-d974c2b78e10" />
+  </Folder>
   <Folder Name="/lectures/OOP/">
     <Project Path="abstract  class/abstract  class.csproj" Id="f56e5748-45d3-461d-9d53-84c4cd9b022e" />
     <Project Path="Collection Link/Collection Link.csproj" Id="f53a8309-e726-4c22-8bcc-35a29d34001a" />
