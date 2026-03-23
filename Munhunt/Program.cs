@@ -4,6 +4,9 @@
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.InputEncoding = System.Text.Encoding.UTF8;
+
             var names = new List<string>
             {
                 "Иванов Иван Иванович",
@@ -49,7 +52,8 @@
         class SearchProgram
         {
             private const int StartSearchCommand = 1;
-            private const int Exit = 2;
+            private const int ShowAllCriminalsCommand = 2;
+            private const int ExitCommand = 3;
 
             private List<Criminal> _criminals = new List<Criminal>();
 
@@ -66,17 +70,24 @@
                 while(isExit == false)
                 {
                     Console.Clear();
-                    ShowAllCriminals();
+
+                    Console.WriteLine($"{StartSearchCommand}. Найти преступников");
+                    Console.WriteLine($"{ShowAllCriminalsCommand}. Показать вех преступников");
+                    Console.WriteLine($"{ExitCommand}. Выход");
 
                     int command = Utils.ReadInt("Выбирете пункт меню");
 
                     switch (command)
                     {
                         case StartSearchCommand: 
-                            Console.WriteLine("Сработал поиск");
+                            SearchCriminals();
                             break;
 
-                        case Exit:
+                        case ShowAllCriminalsCommand:
+                            ShowCriminals(_criminals);
+                            break;
+
+                        case ExitCommand:
                             isExit = true;
                             break;
 
@@ -89,12 +100,46 @@
                 }
             }
 
-            public void ShowAllCriminals()
+            public void ShowCriminals(List<Criminal> criminals)
             {
-                foreach(Criminal criminal in _criminals)
+                if (criminals.Count == 0)
                 {
-                    Console.WriteLine($"{criminal.FullName} | {criminal.Nationality} | {criminal.IsInPrison} | {criminal.Height} | {criminal.Weight}");
+                    Console.WriteLine("Нет преступников для показа");
                 }
+                else
+                {
+                     foreach(Criminal criminal in criminals)
+                    {
+                        Console.WriteLine($"ФИО - {criminal.FullName}\n"+
+                            $"Национальность - {criminal.Nationality}\n"+
+                            $"Под стражей - {criminal.IsInPrison}\n"+
+                            $"Рост - {criminal.Height}\n"+
+                            $"Вес - {criminal.Weight}");
+
+                        Console.WriteLine(new string('=', 30));
+                    }
+                }
+            }
+
+            public void SearchCriminals()
+            {
+                int height = Utils.ReadInt("Введите рост подозреваемого: ");
+                int weight = Utils.ReadInt("Введите вес подозреваемого: ");
+
+                Console.WriteLine("Введите национальность подозреваемого: ");
+                string nationality = Console.ReadLine();
+
+                List<Criminal> criminals = _criminals
+                    .Where(criminal => 
+                        criminal.IsInPrison == false &&
+                        criminal.Height == height &&
+                        criminal.Weight == weight &&
+                        criminal.Nationality.Equals(nationality, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                Console.WriteLine(new string('+', 30));
+                Console.WriteLine("Найденные преступники");
+                ShowCriminals(criminals);
             }
         }
 
@@ -124,19 +169,19 @@
             private int _maxWeight = 200;
             private int _minWeight = 60;
 
-            public List<Criminal> Create(List<string> names, List<string> nationality)
+            public List<Criminal> Create(List<string> names, List<string> nationalities)
             {
                 List<Criminal> criminals = new List<Criminal>();
 
                 for(int i = 0; i < _criminalsCount; i++)
                 {
-                    var name = names[Utils.GenerateRandomNumber(0, names.Count)];
-                    var isInPrison = Utils.GetRandomBoolean();
-                    var height = Utils.GenerateRandomNumber(_minHeight, _maxHeight + 1);
-                    var weight = Utils.GenerateRandomNumber(_minWeight, _maxWeight + 1);
-                    var nat = nationality[Utils.GenerateRandomNumber(0, nationality.Count)];
+                    string name = names[Utils.GenerateRandomNumber(0, names.Count)];
+                    bool isInPrison = Utils.GetRandomBoolean();
+                    int height = Utils.GenerateRandomNumber(_minHeight, _maxHeight + 1);
+                    int weight = Utils.GenerateRandomNumber(_minWeight, _maxWeight + 1);
+                    string nationality = nationalities[Utils.GenerateRandomNumber(0, nationalities.Count)];
 
-                    criminals.Add(new Criminal(name, isInPrison, height, weight, nat));
+                    criminals.Add(new Criminal(name, isInPrison, height, weight, nationality));
                 }
 
                 return criminals;

@@ -63,4 +63,5 @@
   <Folder Name="/pacman/">
     <Project Path="D:/Programming/Junior/GameDeviJuniorLearn/pacman/pacman.csproj" Id="8d06463c-4c7e-4425-9ba6-27c561dd96fc" />
   </Folder>
+  <Project Path="Amnesty/Amnesty.csproj" />
 </Solution>
