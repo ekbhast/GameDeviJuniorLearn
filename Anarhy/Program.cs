@@ -4,6 +4,9 @@
     {
         static void Main (string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.InputEncoding = System.Text.Encoding.UTF8;
+
             var names = new List<string>
             {
                 "Иванов Иван Иванович",
@@ -23,23 +26,38 @@
                 "Егоров Степан Михайлович"
             };
 
-            Hospital hospital = new();
+            var diagnosis = new List<string>
+            {
+                "Грипп",
+                "Диабет",
+                "Рак",
+                "Астма",
+                "Гипертония",
+                "Пневмония",
+                "Мигрень",
+                "Артрит",
+                "COVID-19",
+                "Туберкулёз"
+            };
+
+            Hospital hospital = new(names, diagnosis);
             hospital.Work();            
         }
     }
 
     class Hospital
     {
-        private List<Patient> patients = new();
+        private List<Patient> _patients = new();
 
         private const int SortByFullNameCommand = 1;
         private const int SortByAgeCommand = 2;
         private const int SearchByDiagnosCommand = 3;
         private const int ExitCommand = 4;
 
-        public Hospital()
+        public Hospital(List<string> names, List<string> diagnosis)
         {
-            
+            PatientFactory patientFactory = new();
+            _patients = patientFactory.Create(names, diagnosis);
         }
 
         public void Work()
@@ -48,7 +66,11 @@
 
             while(isExit == false)
             {
-                Console.WriteLine($"{SortByFullNameCommand}. Сортировка по имени");
+                Console.Clear();
+
+                ShowPatients(_patients);
+
+                Console.WriteLine($"\n{SortByFullNameCommand}. Сортировка по имени");
                 Console.WriteLine($"{SortByAgeCommand}. Сортировка по возрасту");
                 Console.WriteLine($"{SearchByDiagnosCommand}. Поиск по заболеванию");
                 Console.WriteLine($"{ExitCommand}. Выход");
@@ -58,15 +80,19 @@
                 switch (command)
                 {
                     case SortByFullNameCommand:
+                        OrderByName();
                         break;
 
                     case SortByAgeCommand:
+                        OrderByAge();
                         break;
 
                     case SearchByDiagnosCommand:
+                        FindByDiagnosis();
                         break;
 
                     case ExitCommand:
+                        isExit = true;
                         break;
 
                     default:
@@ -75,6 +101,51 @@
                 }
 
                 Console.ReadLine();
+            }
+        }
+
+        public void ShowPatients(List<Patient> patients)
+        {
+            foreach(var patient in patients)
+            {
+                Console.WriteLine($"Имя - {patient.FullName}\nВозраст - {patient.Age}\nДиагноз - {patient.Diagnosis}");
+                Console.WriteLine(new string('=', 30));
+            }
+        }
+
+        public void OrderByName()
+        {
+            _patients = _patients.OrderBy(patient => patient.FullName).ToList();
+        }
+
+        public void OrderByAge()
+        {
+            _patients = _patients.OrderBy(patient => patient.Age).ToList();
+        }
+
+        public void FindByDiagnosis()
+        {
+            bool isFilldString = false;
+            string userInput = "";
+
+            while(isFilldString == false)
+            {
+                Console.WriteLine("Введите название болезни для поиска");
+
+                userInput = Console.ReadLine() ?? "";
+                
+                if(userInput.Length > 0) isFilldString = true;
+            }
+
+            List<Patient> foundPatients = _patients.Where(patient => patient.Diagnosis.ToLower() == userInput.ToLower()).ToList();
+            
+            if(foundPatients.Count == 0)
+            {
+                Console.WriteLine("Пациентов с такой болезнью нет, нажмите любую клавишу для продолжения");
+            }
+            else
+            {
+                ShowPatients(foundPatients);                
             }
         }
     }
@@ -100,7 +171,7 @@
             List<Patient> patients = new();
 
             int patientsCount = 10;
-            int minAge = 0;
+            int minAge = 1;
             int maxAge = 70;
 
             for (int i = 0; i < patientsCount; i++)
