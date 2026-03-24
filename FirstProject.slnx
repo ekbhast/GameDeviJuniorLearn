@@ -65,4 +65,6 @@
   </Folder>
   <Project Path="Amnesty/Amnesty.csproj" />
   <Project Path="Anarhy/Anarhy.csproj" />
+  <Project Path="ExpirationDate/ExpirationDate.csproj" />
+  <Project Path="TopPlayers/TopPlayers.csproj" />
 </Solution>

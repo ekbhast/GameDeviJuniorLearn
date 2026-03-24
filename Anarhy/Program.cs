@@ -194,8 +194,7 @@
 
         public static bool GetRandomBoolean()
         {
-            List<bool> bools = new List<bool> { false, true };
-            return bools[s_random.Next(bools.Count)];
+            return s_random.Next(2) == 0;
         }
 
         public static int GenerateRandomNumber(int min, int max)
