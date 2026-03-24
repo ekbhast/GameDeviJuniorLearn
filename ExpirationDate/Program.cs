@@ -56,11 +56,9 @@
 
         public void ShowExpiredProduct()
         {
-            int currentYear = 2026;
+            int currentYear = DateTime.Now.Year;
 
-            List<CannedMeat> expiredProduct = new();
-
-            expiredProduct = _cannedMeats.Where(meat => meat.Year + meat.ExpirationDate < currentYear).ToList();
+            List<CannedMeat> expiredProduct = _cannedMeats.Where(meat => meat.Year + meat.ExpirationDate < currentYear).ToList();
 
             ShowCannedMeat(expiredProduct);
         }
@@ -68,16 +66,16 @@
 
     class CannedMeat
     {
-        public string Name { get; private set; }
-        public int Year { get; private set; }
-        public int ExpirationDate{ get; private set;}
-
         public CannedMeat(string name, int year, int expirationDate)
         {
             Name = name;
             Year = year;
             ExpirationDate = expirationDate;
         }
+
+        public string Name { get; private set; }
+        public int Year { get; private set; }
+        public int ExpirationDate{ get; private set;}
     }
 
     class CannedMeatFactory
@@ -113,8 +111,7 @@
 
         public static bool GetRandomBoolean()
         {
-            List<bool> bools = new List<bool> { false, true };
-            return bools[s_random.Next(bools.Count)];
+            return s_random.Next(2) == 0;
         }
 
         public static int GenerateRandomNumber(int min, int max)

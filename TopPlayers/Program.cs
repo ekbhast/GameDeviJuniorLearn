@@ -33,6 +33,8 @@
 
     class Server
     {
+        private const int TopPlayersCount = 3;
+
         private List<Player> _players = new();
 
         public Server(List<string> names)
@@ -50,12 +52,10 @@
             ShowPlayers(_players);
             Console.WriteLine(new string('=', 40));
 
-            Console.WriteLine("\nТоп 3 игрока по уровню:\n");
             ShowTopLevelPlayers();
 
             Console.WriteLine(new string('*', 40));
 
-            Console.WriteLine("\nТоп 3 игрока по силе:\n");
             ShowTopPowerPlayers();
 
             Console.ReadKey();
@@ -72,33 +72,33 @@
 
         public void ShowTopLevelPlayers()
         {
-            int topPlaces = 3;
-            List<Player> topPlayers = _players.OrderByDescending(player => player.Level).Take(topPlaces).ToList();
-
+            List<Player> topPlayers = _players.OrderByDescending(player => player.Level).Take(TopPlayersCount).ToList();
+            
+            Console.WriteLine($"\nТоп {TopPlayersCount} игрока по уровню:\n");
             ShowPlayers(topPlayers);
         }
 
-            public void ShowTopPowerPlayers()
+        public void ShowTopPowerPlayers()
         {
-            int topPlaces = 3;
-            List<Player> topPlayers = _players.OrderByDescending(player => player.Power).Take(topPlaces).ToList();
+            List<Player> topPlayers = _players.OrderByDescending(player => player.Power).Take(TopPlayersCount).ToList();
 
+            Console.WriteLine($"\nТоп {TopPlayersCount} игрока по силе:\n");
             ShowPlayers(topPlayers);
         }
     }
 
     class Player
     {
-        public string FullName { get; private set; }
-        public int Level { get; private set; }
-        public int Power { get; private set; }
-
         public Player( string fullName, int level, int power)
         {
             FullName = fullName;
             Level = level;
             Power = power;
         }
+
+        public string FullName { get; private set; }
+        public int Level { get; private set; }
+        public int Power { get; private set; }
     }
 
     class PlayerFactory
