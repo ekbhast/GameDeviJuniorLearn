@@ -18,7 +18,10 @@
                 "Тушёнка армейская"
             };
 
-            Warehouse warehouse = new(names);
+            CannedMeatFactory factory = new();
+            List<CannedMeat> cannedMeats = factory.Create(names);
+
+            Warehouse warehouse = new(cannedMeats);
             warehouse.Start();
         }
     }
@@ -27,10 +30,9 @@
     {
         private List<CannedMeat> _cannedMeats = new();
 
-        public Warehouse(List<string> names)
+        public Warehouse(List<CannedMeat> cannedMeats)
         {
-            CannedMeatFactory cannedMeatFactory = new();
-            _cannedMeats = cannedMeatFactory.Create(names);
+            _cannedMeats = cannedMeats.ToList();
         }
 
         public void Start()
@@ -38,7 +40,7 @@
             Console.Clear();
             Console.WriteLine("Все продукты:");
             ShowCannedMeat(_cannedMeats);   
-            Console.WriteLine(new string('=', 40));
+            Console.WriteLine(Utils.EqualSignString);
 
             Console.WriteLine("\nПросроченные продукты\n");
             ShowExpiredProduct();
@@ -50,7 +52,7 @@
             foreach(var meat in cannedMeats)
             {
                 Console.WriteLine($"Наименование - {meat.Name}\nГод выпуска - {meat.Year}\nСрок годности - {meat.ExpirationDate}");
-                Console.WriteLine(new string('-', 40));
+                Console.WriteLine(Utils.EqualSignString);
             }
         }
 
@@ -107,6 +109,9 @@
 
     class Utils
     {
+        private const int EqualSignCount = 40;
+        public static string EqualSignString { get; } = new string('=', EqualSignCount);
+
         private static readonly Random s_random = new Random();
 
         public static bool GetRandomBoolean()

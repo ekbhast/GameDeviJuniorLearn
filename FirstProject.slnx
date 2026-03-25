@@ -67,4 +67,5 @@
   <Project Path="Anarhy/Anarhy.csproj" />
   <Project Path="ExpirationDate/ExpirationDate.csproj" />
   <Project Path="TopPlayers/TopPlayers.csproj" />
+  <Project Path="Weapons Report/Weapons Report.csproj" />
 </Solution>
