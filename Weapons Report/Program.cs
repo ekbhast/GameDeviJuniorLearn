@@ -66,8 +66,7 @@
         {
             ShowAllSoldiersData();
 
-            var data = SelectedSoldierData();
-            ShowSelectedSoldiersData(data);
+            SelectAndShowSoldierData();
 
             Console.ReadLine();
         }
@@ -83,18 +82,15 @@
             }
         }
 
-        public List<(string Fullname, string Rank)> SelectedSoldierData()
+        public void SelectAndShowSoldierData()
         {
-            return _soldiers.Select(soldier => (soldier.FullName, soldier.Rank)).ToList();
-        }
+            var soldierData = _soldiers.Select(soldier => new {soldier.FullName, soldier.Rank}).ToList();
 
-        public void ShowSelectedSoldiersData(List<(string Fullname, string Rank)> soldiersData)
-        {
-            Console.WriteLine("Выранные данные:\n");
+            Console.WriteLine("Выбранные данные:\n");
 
-            foreach(var soldier in soldiersData)
+            foreach(var soldier in soldierData)
             {
-                Console.WriteLine($"Полное имя - {soldier.Fullname}\nЗвание - {soldier.Rank}");
+                Console.WriteLine($"Полное имя - {soldier.FullName}\nЗвание - {soldier.Rank}");
                 Console.WriteLine(Utils.EqualSignString);
             }
         }
@@ -143,13 +139,15 @@
      class Utils
     {
         private const int EqualSignCount = 40;
+        private static readonly bool[] s_bools = [false, true];
+
         public static string EqualSignString { get; } = new string('=', EqualSignCount);
 
         private static readonly Random s_random = new Random();
-
+        
         public static bool GetRandomBoolean()
         {
-            return s_random.Next(2) == 0;
+            return s_bools[s_random.Next(s_bools.Length)];
         }
 
         public static int GenerateRandomNumber(int min, int max)
